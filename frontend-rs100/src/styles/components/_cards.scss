@@ -1,0 +1,14 @@
+// components/_cards.scss
+
+.premium-card {
+  @include glassmorphism;
+  border-radius: 16px;
+  padding: 2rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    transform: translateY(-5px);
+    border-color: rgba(212, 175, 55, 0.5);
+    box-shadow: 0 12px 40px 0 rgba(212, 175, 55, 0.15);
+  }
+}

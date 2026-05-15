@@ -1,0 +1,207 @@
+// SCSS Variables for RSUD Aloei Saboe 100th Anniversary
+// Maps to CSS Custom Properties for Real-Time Dynamic Theme Selection
+
+// Core SCSS tokens pointing to dynamic CSS Variables with Fallbacks
+$color-bg-dark: var(--color-bg-dark, #03140A);
+$color-nav-bg: var(--color-nav-bg, var(--color-bg-dark)); // Dedicated Navbar background
+$color-primary: var(--color-primary, #00FF87);
+$color-secondary: var(--color-secondary, #0B301D);
+$color-gold: var(--color-gold, #F79633);
+$color-gold-light: var(--color-gold-light, #FFC385);
+$color-gold-dark: var(--color-gold-dark, #C16400);
+$color-white: var(--color-white, #FFFFFF);
+$color-gray-light: var(--color-gray-light, #F5F7FA);
+$color-gray-dark: var(--color-gray-dark, #1E293B);
+$color-success: var(--color-success, #00FF87);
+
+// Typography Font Families
+$font-title: 'Playfair Display', serif;
+$font-sans: 'Inter', sans-serif;
+
+// ==========================================================================
+// Dynamic Theme Color Definitions (CSS Custom Properties)
+// ==========================================================================
+
+:root, .theme-light-mint {
+  --color-bg-dark: #E6F5EC;      // Soft Light Mint Green
+  --color-nav-bg: #00A859;       // Elegant Emerald Green Header for light mode
+  --color-primary: #00A859;      // Deep Emerald Green for crisp readability
+  --color-secondary: #EAF8F1;    // Light Mint Accent
+  --color-gold: #E27A0B;         // Centennial Orange-Gold
+  --color-gold-light: #FFC385;
+  --color-gold-dark: #C16400;
+  --color-white: #1E293B;        // Swapped! Text is Dark Slate for Light Mode
+  --color-gray-light: #FFFFFF;
+  --color-gray-dark: #F1F5F9;
+  --color-success: #00A859;
+  
+  // Adaptive Card Colors
+  --color-card-bg: rgba(255, 255, 255, 0.9);
+  --color-card-text: #1E293B;
+
+  // Adaptive Status Colors (Dark Green Navbar -> White Text Contrast!)
+  --color-status-active-bg: rgba(255, 255, 255, 0.15);
+  --color-status-active-shadow: rgba(255, 255, 255, 0.2);
+  --color-status-active-text: #FFFFFF;
+  --color-status-active-border: rgba(255, 255, 255, 0.5);
+}
+
+.theme-dark-obsidian {
+  --color-bg-dark: #03140A;      // Luxury Dark Emerald Black
+  --color-nav-bg: #03140A;       // Matching header background
+  --color-primary: #00FF87;      // High-Luminance Mint Emerald (TV Optimized)
+  --color-secondary: #0B301D;    // Deep Forest Green
+  --color-gold: #F79633;         // Glowing Centennial Gold
+  --color-gold-light: #FFC385;
+  --color-gold-dark: #C16400;
+  --color-white: #FFFFFF;        // White text for Dark Mode
+  --color-gray-light: #0B301D;
+  --color-gray-dark: #1E293B;
+  --color-success: #00FF87;
+  
+  // Adaptive Card Colors
+  --color-card-bg: rgba(11, 48, 29, 0.65);
+  --color-card-text: #F1F5F9;
+
+  // Adaptive Status Colors (Dark Forest Navbar -> High-Luminance Mint Text!)
+  --color-status-active-bg: rgba(0, 255, 135, 0.08);
+  --color-status-active-shadow: rgba(0, 255, 135, 0.2);
+  --color-status-active-text: #00FF87;
+  --color-status-active-border: #00FF87;
+}
+
+.theme-champagne-gold {
+  --color-bg-dark: #FAF6EE;      // Antique Champagne Cream
+  --color-nav-bg: #FAF6EE;       // Matching header
+  --color-primary: #C16400;      // Royal Amber Gold
+  --color-secondary: #F4ECE1;    // Soft Beige Gold
+  --color-gold: #D97706;         // Warm Gold Heading
+  --color-gold-light: #FCD34D;
+  --color-gold-dark: #92400E;
+  --color-white: #2C1A04;        // Deep Espresso text for antique look
+  --color-gray-light: #FFFFFF;
+  --color-gray-dark: #F5EFEB;
+  --color-success: #C16400;
+  
+  // Adaptive Card Colors
+  --color-card-bg: rgba(255, 255, 255, 0.9);
+  --color-card-text: #2C1A04;
+
+  // Adaptive Status Colors (Light Cream Navbar -> Dark Amber Gold Text Contrast!)
+  --color-status-active-bg: rgba(193, 100, 0, 0.08);
+  --color-status-active-shadow: rgba(193, 100, 0, 0.15);
+  --color-status-active-text: #C16400;
+  --color-status-active-border: rgba(193, 100, 0, 0.3);
+}
+
+.theme-centennial-gold {
+  --color-bg-dark: #0F172A;      // Obsidian Dark Slate
+  --color-nav-bg: #1E293B;       // Deep Slate Gray Navbar
+  --color-primary: #F59E0B;      // Premium Imperial Amber Gold
+  --color-secondary: #334155;    // Slate Accent Borders
+  --color-gold: #F59E0B;         // Centennial Gold Numbers
+  --color-gold-light: #FDE047;
+  --color-gold-dark: #CA8A04;
+  --color-white: #E2E8F0;        // High-contrast soft white text
+  --color-gray-light: #1E293B;
+  --color-gray-dark: #0F172A;
+  --color-success: #F59E0B;
+  
+  // Adaptive Card Colors
+  --color-card-bg: #1E293B;
+  --color-card-text: #94A3B8;
+
+  // Adaptive Shield Colors
+  --color-shield-bg: #111827;
+  --color-shield-text: #F59E0B;
+
+  // Adaptive Status Colors
+  --color-status-active-bg: rgba(245, 158, 11, 0.08);
+  --color-status-active-shadow: rgba(245, 158, 11, 0.2);
+  --color-status-active-text: #F59E0B;
+  --color-status-active-border: #F59E0B;
+}
+
+.theme-emerald-royal {
+  --color-bg-dark: #062C17;      // Deep Rich Pine Forest Green
+  --color-nav-bg: #041E10;       // Dark Spruce Header
+  --color-primary: #10B981;      // Emerald Green Aksen
+  --color-secondary: #064E3B;    // Forest Accents
+  --color-gold: #F79633;         // Radiant Gold Header
+  --color-gold-light: #FFC385;
+  --color-gold-dark: #C16400;
+  --color-white: #ECFDF5;        // Soft Sage-white readable text
+  --color-gray-light: #093C20;
+  --color-gray-dark: #041E10;
+  --color-success: #10B981;
+
+  // Adaptive Card Colors
+  --color-card-bg: #093C20;
+  --color-card-text: #A7F3D0;
+
+  // Adaptive Shield Colors
+  --color-shield-bg: #041E10;
+  --color-shield-text: #F79633;
+
+  // Adaptive Status Colors
+  --color-status-active-bg: rgba(16, 185, 129, 0.08);
+  --color-status-active-shadow: rgba(16, 185, 129, 0.2);
+  --color-status-active-text: #10B981;
+  --color-status-active-border: #10B981;
+}
+
+.theme-midnight-velvet {
+  --color-bg-dark: #090514;      // Deep Indigo Velvet Purple
+  --color-nav-bg: #130B24;       // Royal Purple Navbar
+  --color-primary: #A855F7;      // High-Luminance Orchid Accent
+  --color-secondary: #3B0764;    // Deep Purple Accents
+  --color-gold: #F59E0B;         // Glowing Centennial Gold
+  --color-gold-light: #FCD34D;
+  --color-gold-dark: #B45309;
+  --color-white: #F3E8FF;        // Soft lavender white readable text
+  --color-gray-light: #1A0F33;
+  --color-gray-dark: #090514;
+  --color-success: #A855F7;
+
+  // Adaptive Card Colors
+  --color-card-bg: #1A0F33;
+  --color-card-text: #D8B4FE;
+
+  // Adaptive Shield Colors
+  --color-shield-bg: #0E081C;
+  --color-shield-text: #F59E0B;
+
+  // Adaptive Status Colors
+  --color-status-active-bg: rgba(168, 85, 247, 0.08);
+  --color-status-active-shadow: rgba(168, 85, 247, 0.2);
+  --color-status-active-text: #C084FC;
+  --color-status-active-border: #A855F7;
+}
+
+.theme-teal-platinum {
+  --color-bg-dark: #F8FAFC;      // Clinical Platinum Slate Light Mode
+  --color-nav-bg: #0F172A;       // Contrast Dark Navy Header (very crisp!)
+  --color-primary: #0EA5E9;      // Vibrant Sky Blue Medis
+  --color-secondary: #E2E8F0;    // Soft Slate Border
+  --color-gold: #0284C7;         // Royal Cyan Blue Heading
+  --color-gold-light: #38BDF8;
+  --color-gold-dark: #0369A1;
+  --color-white: #334155;        // Dark Slate readable text
+  --color-gray-light: #FFFFFF;
+  --color-gray-dark: #F1F5F9;
+  --color-success: #0EA5E9;
+
+  // Adaptive Card Colors
+  --color-card-bg: #FFFFFF;
+  --color-card-text: #475569;
+
+  // Adaptive Shield Colors
+  --color-shield-bg: #F1F5F9;
+  --color-shield-text: #0284C7;
+
+  // Adaptive Status Colors
+  --color-status-active-bg: rgba(14, 165, 233, 0.08);
+  --color-status-active-shadow: rgba(14, 165, 233, 0.2);
+  --color-status-active-text: #38BDF8;
+  --color-status-active-border: #0EA5E9;
+}

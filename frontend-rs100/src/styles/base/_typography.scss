@@ -1,0 +1,17 @@
+// base/_typography.scss
+
+body {
+  font-family: $font-sans;
+}
+
+.font-historical {
+  font-family: $font-title;
+}
+
+.text-gold {
+  color: $color-gold;
+}
+
+.text-gold-gradient {
+  @include gold-gradient-text;
+}

@@ -1,0 +1,27 @@
+// components/_buttons.scss
+
+.premium-btn {
+  background: linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%);
+  color: #070B19;
+  font-family: $font-sans;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border: none;
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+  
+  &:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 25px rgba(212, 175, 55, 0.5);
+  }
+  
+  &:active {
+    transform: scale(0.98);
+  }
+}

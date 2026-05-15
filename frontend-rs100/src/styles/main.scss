@@ -1,0 +1,22 @@
+// main.scss - Entrypoint of the SCSS pipeline
+// Imports all abstracts, base, components, layouts and theme partials in exact sequence
+
+// 1. Abstracts (Variables, Mixins)
+@import './abstracts/variables';
+@import './abstracts/mixins';
+
+// 2. Base Styles
+@import './base/reset';
+@import './base/typography';
+
+// 3. Components
+@import './components/buttons';
+@import './components/cards';
+@import './components/animations';
+
+// 4. Layout
+@import './layout/grid';
+@import './layout/header';
+
+// 5. Themes
+@import './themes/century';

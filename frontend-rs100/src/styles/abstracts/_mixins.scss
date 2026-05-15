@@ -1,0 +1,51 @@
+// abstracts/_mixins.scss
+
+@mixin glassmorphism {
+  background: rgba(11, 48, 29, 0.45); // Deep Forest Green glassmorphism
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(247, 150, 51, 0.25); // Subtle gold-orange border
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+}
+
+@mixin gold-gradient-text {
+  background: linear-gradient(
+    110deg,
+    var(--color-gold-light, #FFC385) 0%,
+    var(--color-gold, #F79633) 30%,
+    #FFFFFF 48%, // Bright specular highlight reflection core
+    var(--color-gold, #F79633) 65%,
+    var(--color-gold-dark, #C16400) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: metallic-shimmer 6s linear infinite;
+}
+
+@mixin gold-border-gradient {
+  border-image: linear-gradient(135deg, $color-gold-light, $color-gold, $color-gold-dark) 1;
+}
+
+// Responsive break points
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == "sm" {
+    @media (max-width: 576px) { @content; }
+  } @else if $breakpoint == "md" {
+    @media (max-width: 768px) { @content; }
+  } @else if $breakpoint == "lg" {
+    @media (max-width: 968px) { @content; }
+  } @else if $breakpoint == "xl" {
+    @media (max-width: 1200px) { @content; }
+  }
+}
+
+@keyframes metallic-shimmer {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}

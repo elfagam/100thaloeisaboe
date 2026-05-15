@@ -1,0 +1,1847 @@
+<template>
+  <div class="launching-page">
+    <div class="interactive-container">
+      
+      <!-- Phase 1: Cinematic ECG Launcher -->
+      <div v-if="!store.isActivated" class="launcher-panel">
+        <div v-if="!isLaunching" class="instructions animate-fade">
+          <h3 class="gold-subtitle">SISTEM SIAP DILUNCURKAN</h3>
+          <p>Yth. Bapak Wali Kota Gorontalo,</p>
+          <p class="touch-call">Silakan Sentuh Ikon Jantung Di Bawah Untuk Memulai Peresmian</p>
+          
+          <div v-if="errorMessage" class="error-msg" style="max-width: 500px; margin: 2rem auto 0;">
+            ⚠️ {{ errorMessage }}
+          </div>
+        </div>
+
+        <div class="sensor-container">
+          <!-- Heart Button to touch -->
+          <button v-if="!isLaunching" @click="startCinematicLaunch" class="heart-sensor">
+            <div class="heart-icon-wrap">
+              <svg viewBox="0 0 32 32" class="beating-heart">
+                <path d="M16,28.2 C16,28.2 3,20.2 3,11.5 C3,6.3 7.3,2 12.5,2 C15.5,2 18,3.7 19.5,6.3 C21,3.7 23.5,2 26.5,2 C31.7,2 36,6.3 36,11.5 C36,20.2 23,28.2 23,28.2 Z" transform="scale(0.8) translate(4, 2)" fill="url(#heart-grad)" />
+                <defs>
+                  <radialGradient id="heart-grad" cx="50%" cy="30%" r="50%">
+                    <stop offset="0%" stop-color="#FFD1A9" />
+                    <stop offset="50%" stop-color="#F79633" />
+                    <stop offset="100%" stop-color="#00A859" />
+                  </radialGradient>
+                </defs>
+              </svg>
+            </div>
+            <span class="heart-label">SENTUH JANTUNG</span>
+            <div class="pulse-ring r1"></div>
+            <div class="pulse-ring r2"></div>
+            <div class="pulse-ring r3"></div>
+          </button>
+
+          <!-- Cinematic ECG Tracing & Building Outline Canvas -->
+          <div v-else class="cinematic-canvas">
+            <svg class="ecg-svg" viewBox="0 0 800 400">
+              <!-- Glow Filters (Enhanced for TV/LED Projector Screens) -->
+              <defs>
+                <filter id="gold-glow" x="-30%" y="-30%" width="160%" height="160%">
+                  <feGaussianBlur stdDeviation="14" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <filter id="green-glow" x="-30%" y="-30%" width="160%" height="160%">
+                  <feGaussianBlur stdDeviation="18" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+
+              <!-- Custom Tracing Elements incorporating Green and Orange-Gold -->
+              <!-- Part 1: Initial ECG Beat (glowing Emerald Green) -->
+              <path class="path-element path-ecg" d="M 50,200 L 120,200 L 135,110 L 150,290 L 165,170 L 180,200 L 250,200" filter="url(#green-glow)" />
+              
+              <!-- Part 2: Tracing number '1' of '100' (glowing Orange-Gold) -->
+              <path class="path-element path-one" d="M 285,150 L 310,110 L 310,270" filter="url(#gold-glow)" />
+              
+              <!-- Part 3: Tracing first '0' of '100' (glowing Orange-Gold) -->
+              <path class="path-element path-zero-one" d="M 335,190 C 335,120 385,120 385,190 C 385,260 335,260 335,190 Z" filter="url(#gold-glow)" />
+              
+              <!-- Part 4: Tracing second '0' of '100' (glowing Orange-Gold) -->
+              <path class="path-element path-zero-two" d="M 410,190 C 410,120 460,120 460,190 C 460,260 410,260 410,190 Z" filter="url(#gold-glow)" />
+              
+              <!-- Part 5: Tracing Hospital Silhouette (glowing Emerald Green) -->
+              <path class="path-element path-building" d="M 485,200 L 515,200 L 515,160 L 545,160 L 545,110 L 580,110 L 580,70 L 615,70 L 615,110 L 650,110 L 650,160 L 680,160 L 680,200 L 750,200" filter="url(#green-glow)" />
+              
+              <!-- Part 6: Glowing Medical Cross at the center top of building (shining pure glowing White!) -->
+              <path class="path-element path-cross" d="M 590,90 L 606,90 M 598,82 L 598,98" filter="url(#green-glow)" />
+            </svg>
+
+            <!-- Cinematic Progress Details -->
+            <div class="cinematic-footer">
+              <div class="loader-track">
+                <span class="loader-fill" :style="{ width: progressPercentage + '%' }"></span>
+              </div>
+              <p class="status-msg animate-pulse">{{ activeStatusMessage }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 2: Successful Launch Celebration (Plaque) -->
+      <div v-else class="celebration-panel">
+        <div class="gold-confetti"></div>
+        <div class="plaque-container premium-card">
+          <div class="plaque-header">
+            <span class="plaque-logo">RSUD Prof. Dr. H. Aloei Saboe</span>
+            <div class="plaque-divider"></div>
+          </div>
+          
+          <h1 class="plaque-title font-historical text-gold-gradient">PRASASTI DIGITAL</h1>
+          <p class="plaque-declaration">
+            "DENGAN RAHMAT TUHAN YANG MAHA ESA, DENGAN INI KAMI NYATAKAN PERESMIAN SATU ABAD <br/>
+            <strong>RSUD PROF. DR. H. ALOEI SABOE (1926-2026)</strong> <br/>
+            DAN PELUNCURAN E-BOOK SEJARAH SECARA RESMI DIMULAI."
+          </p>
+
+          <div class="signature-block">
+            <p class="city-date">Gorontalo, 20 Mei 2026</p>
+            <div class="signature-box" @click="drawSignature">
+              <span v-if="!hasSigned" class="sign-prompt">Sentuh disini untuk tanda tangan prasasti digital</span>
+              <svg v-else class="signature-svg" viewBox="0 0 400 150">
+                <path d="M50,90 Q90,30 130,90 T210,90 T290,40 T350,110" fill="none" stroke="#F79633" stroke-width="4" stroke-linecap="round" />
+                <path d="M80,100 L320,80" fill="none" stroke="#C16400" stroke-width="2" />
+              </svg>
+            </div>
+            <p class="signatory-name">WALI KOTA GORONTALO</p>
+          </div>
+
+          <!-- Centennial Reflection Narrative Slideshow (Only shows after signature is completed!) -->
+          <transition name="slide-fade">
+            <div v-if="hasSigned" class="reflection-panel-card animate-fade">
+              <div class="reflection-header">
+                <span class="reflection-tag font-historical text-gold-gradient">📖 PENJELASAN SATU ABAD (AUTO-PLAY)</span>
+                <div class="reflection-controls">
+                  <button @click="prevReflection" class="control-arrow-btn" :disabled="currentReflectionIndex === 0">◀</button>
+                  <span class="control-count">{{ currentReflectionIndex + 1 }} / {{ reflections.length }}</span>
+                  <button @click="nextReflection" class="control-arrow-btn" :disabled="currentReflectionIndex === reflections.length - 1">▶</button>
+                  <button @click="toggleReflectionAutoPlay" class="control-play-btn" :class="{ active: isReflectionPlaying }">
+                    {{ isReflectionPlaying ? '⏸ Jeda' : '▶ Putar' }}
+                  </button>
+                </div>
+              </div>
+              <div class="reflection-body">
+                <p class="reflection-text">
+                  {{ reflections[currentReflectionIndex] }}
+                </p>
+              </div>
+            </div>
+          </transition>
+
+          <div class="plaque-footer">
+            <span class="badge">EST. 1926</span>
+            <button @click="resetEverything" class="reset-btn">Reset</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
+import { useActivationStore } from '../store/activation'
+
+// =========================================================
+// NATIVE WEB AUDIO API SYNTHESIZER (ZERO-FILE FALLBACK)
+// =========================================================
+class NativeSynthesizer {
+  constructor() {
+    this.ctx = null
+    this.riserOsc = null
+    this.heartbeatInterval = null
+  }
+
+  init() {
+    if (!this.ctx) {
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)()
+    }
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume()
+    }
+  }
+
+  playHeartbeat(theme) {
+    this.init()
+    this.stopHeartbeat()
+    if (theme === 'mute') return
+
+    const playThud = () => {
+      const now = this.ctx.currentTime
+      if (theme === 'clinical') {
+        // High-pitch patient monitor clinical beep
+        this.beep(now, 1000, 0.08)
+      } else if (theme === 'orchestral') {
+        // Warm low orchestral string/synth drone (triangle wave)
+        this.drone(now, 110, 1.3)
+      } else {
+        // Futuristic low-frequency thumping heartbeat
+        this.thud(now, 75, 0.28)
+        this.thud(now + 0.16, 60, 0.22)
+      }
+    }
+
+    playThud()
+    const intervalMs = theme === 'clinical' ? 1000 : theme === 'orchestral' ? 1400 : 1300
+    this.heartbeatInterval = setInterval(playThud, intervalMs)
+  }
+
+  stopHeartbeat() {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval)
+      this.heartbeatInterval = null
+    }
+  }
+
+  playWelcomingIntro(theme) {
+    this.init()
+    if (theme === 'mute') return
+    const now = this.ctx.currentTime
+
+    if (theme === 'clinical') {
+      // Warm elegant clinical PA Chime + Digital Shimmer
+      // Sol-Do-Mi-Sol (392Hz, 523.25Hz, 659.25Hz, 783.99Hz)
+      const notes = [392.00, 523.25, 659.25, 783.99]
+      notes.forEach((freq, index) => {
+        const osc = this.ctx.createOscillator()
+        const gain = this.ctx.createGain()
+        osc.type = 'sine'
+        osc.frequency.setValueAtTime(freq, now + index * 0.22)
+        gain.gain.setValueAtTime(0.08, now + index * 0.22)
+        gain.gain.exponentialRampToValueAtTime(0.001, now + index * 0.22 + 1.8)
+        osc.connect(gain)
+        gain.connect(this.ctx.destination)
+        osc.start(now + index * 0.22)
+        osc.stop(now + index * 0.22 + 1.8)
+      })
+      
+      // Clinical gentle scan sweep
+      const sweepOsc = this.ctx.createOscillator()
+      const sweepGain = this.ctx.createGain()
+      sweepOsc.type = 'sine'
+      sweepOsc.frequency.setValueAtTime(200, now)
+      sweepOsc.frequency.exponentialRampToValueAtTime(800, now + 1.2)
+      sweepGain.gain.setValueAtTime(0.02, now)
+      sweepGain.gain.exponentialRampToValueAtTime(0.001, now + 1.2)
+      sweepOsc.connect(sweepGain)
+      sweepGain.connect(this.ctx.destination)
+      sweepOsc.start(now)
+      sweepOsc.stop(now + 1.2)
+    } else if (theme === 'orchestral') {
+      // Majestic Orchestral Brass Crescendo + Gold Wind Chimes
+      // Layered warm triad chord: G3, B3, D4, G4, B4, D5 (196Hz, 246.9Hz, 293.6Hz, 392Hz, 493.8Hz, 587.3Hz)
+      const freqs = [196.00, 246.94, 293.66, 392.00, 493.88, 587.33]
+      freqs.forEach((freq, index) => {
+        const osc = this.ctx.createOscillator()
+        const gain = this.ctx.createGain()
+        osc.type = 'triangle'
+        osc.frequency.setValueAtTime(freq, now)
+        // Crescendo swell!
+        gain.gain.setValueAtTime(0.01, now)
+        gain.gain.linearRampToValueAtTime(0.08, now + 1.0)
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 3.0)
+        osc.connect(gain)
+        gain.connect(this.ctx.destination)
+        osc.start(now)
+        osc.stop(now + 3.0)
+      })
+
+      // Gold wind chimes sweep (rapid cascade of very high sine wave beeps)
+      for (let i = 0; i < 15; i++) {
+        const osc = this.ctx.createOscillator()
+        const gain = this.ctx.createGain()
+        osc.type = 'sine'
+        const pitch = 2000 + i * 150 // 2kHz to 4.25kHz
+        const timeOffset = i * 0.08
+        osc.frequency.setValueAtTime(pitch, now + timeOffset)
+        gain.gain.setValueAtTime(0.015, now + timeOffset)
+        gain.gain.exponentialRampToValueAtTime(0.001, now + timeOffset + 0.6)
+        osc.connect(gain)
+        gain.connect(this.ctx.destination)
+        osc.start(now + timeOffset)
+        osc.stop(now + timeOffset + 0.6)
+      }
+    } else {
+      // Futuristic Modern: Cyber sweep + digital glass harp arpeggio
+      // C5, E5, G5, C6 (523.25Hz, 659.25Hz, 783.99Hz, 1046.50Hz)
+      const notes = [523.25, 659.25, 783.99, 1046.50]
+      notes.forEach((freq, index) => {
+        const osc = this.ctx.createOscillator()
+        const gain = this.ctx.createGain()
+        osc.type = 'triangle'
+        osc.frequency.setValueAtTime(freq, now + index * 0.12)
+        gain.gain.setValueAtTime(0.06, now + index * 0.12)
+        gain.gain.exponentialRampToValueAtTime(0.001, now + index * 0.12 + 1.5)
+        osc.connect(gain)
+        gain.connect(this.ctx.destination)
+        osc.start(now + index * 0.12)
+        osc.stop(now + index * 0.12 + 1.5)
+      })
+
+      // Cyber high pitch laser rise
+      const laserOsc = this.ctx.createOscillator()
+      const laserGain = this.ctx.createGain()
+      laserOsc.type = 'sawtooth'
+      laserOsc.frequency.setValueAtTime(800, now)
+      laserOsc.frequency.exponentialRampToValueAtTime(2500, now + 1.0)
+      // Very soft volume since sawtooth is sharp
+      laserGain.gain.setValueAtTime(0.008, now)
+      laserGain.gain.exponentialRampToValueAtTime(0.001, now + 1.0)
+      laserOsc.connect(laserGain)
+      laserGain.connect(this.ctx.destination)
+      laserOsc.start(now)
+      laserOsc.stop(now + 1.0)
+    }
+  }
+
+  beep(time, freq, duration) {
+    const osc = this.ctx.createOscillator()
+    const gain = this.ctx.createGain()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(freq, time)
+    gain.gain.setValueAtTime(0.06, time)
+    gain.gain.exponentialRampToValueAtTime(0.001, time + duration)
+    osc.connect(gain)
+    gain.connect(this.ctx.destination)
+    osc.start(time)
+    osc.stop(time + duration)
+  }
+
+  drone(time, freq, duration) {
+    const osc = this.ctx.createOscillator()
+    const gain = this.ctx.createGain()
+    osc.type = 'triangle'
+    osc.frequency.setValueAtTime(freq, time)
+    gain.gain.setValueAtTime(0.05, time)
+    gain.gain.linearRampToValueAtTime(0.05, time + duration - 0.2)
+    gain.gain.exponentialRampToValueAtTime(0.001, time + duration)
+    osc.connect(gain)
+    gain.connect(this.ctx.destination)
+    osc.start(time)
+    osc.stop(time + duration)
+  }
+
+  thud(time, freq, duration) {
+    const osc = this.ctx.createOscillator()
+    const gain = this.ctx.createGain()
+    
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(freq, time)
+    osc.frequency.exponentialRampToValueAtTime(0.01, time + duration)
+    
+    gain.gain.setValueAtTime(0.22, time)
+    gain.gain.exponentialRampToValueAtTime(0.01, time + duration)
+    
+    osc.connect(gain)
+    gain.connect(this.ctx.destination)
+    
+    osc.start(time)
+    osc.stop(time + duration)
+  }
+
+  playLaunchStart(theme) {
+    this.init()
+    if (theme === 'mute') return
+    const now = this.ctx.currentTime
+    const duration = 0.9
+    
+    const osc = this.ctx.createOscillator()
+    const gain = this.ctx.createGain()
+    const filter = this.ctx.createBiquadFilter()
+    
+    if (theme === 'clinical') {
+      osc.type = 'sine'
+      osc.frequency.setValueAtTime(250, now)
+      osc.frequency.exponentialRampToValueAtTime(500, now + duration)
+      gain.gain.setValueAtTime(0.08, now)
+    } else if (theme === 'orchestral') {
+      osc.type = 'triangle'
+      osc.frequency.setValueAtTime(55, now)
+      osc.frequency.exponentialRampToValueAtTime(200, now + duration)
+      gain.gain.setValueAtTime(0.18, now)
+    } else {
+      osc.type = 'sawtooth'
+      osc.frequency.setValueAtTime(45, now)
+      osc.frequency.exponentialRampToValueAtTime(320, now + duration)
+      gain.gain.setValueAtTime(0.18, now)
+    }
+    
+    filter.type = 'lowpass'
+    filter.frequency.setValueAtTime(140, now)
+    filter.frequency.exponentialRampToValueAtTime(550, now + duration)
+    
+    gain.gain.exponentialRampToValueAtTime(0.01, now + duration)
+    
+    osc.connect(filter)
+    filter.connect(gain)
+    gain.connect(this.ctx.destination)
+    
+    osc.start(now)
+    osc.stop(now + duration)
+  }
+
+  playRiser(theme, duration) {
+    this.init()
+    if (theme === 'mute') return
+    const now = this.ctx.currentTime
+    
+    const osc = this.ctx.createOscillator()
+    const gain = this.ctx.createGain()
+    
+    if (theme === 'clinical') {
+      osc.type = 'sine'
+      osc.frequency.setValueAtTime(440, now)
+      osc.frequency.linearRampToValueAtTime(880, now + duration)
+      gain.gain.setValueAtTime(0.02, now)
+      gain.gain.linearRampToValueAtTime(0.08, now + duration - 0.5)
+    } else if (theme === 'orchestral') {
+      osc.type = 'triangle'
+      osc.frequency.setValueAtTime(80, now)
+      osc.frequency.linearRampToValueAtTime(320, now + duration)
+      gain.gain.setValueAtTime(0.03, now)
+      gain.gain.linearRampToValueAtTime(0.14, now + duration - 0.5)
+    } else {
+      osc.type = 'sine'
+      osc.frequency.setValueAtTime(110, now)
+      osc.frequency.linearRampToValueAtTime(500, now + duration)
+      gain.gain.setValueAtTime(0.03, now)
+      gain.gain.linearRampToValueAtTime(0.18, now + duration - 0.5)
+    }
+    
+    gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
+    
+    osc.connect(gain)
+    gain.connect(this.ctx.destination)
+    
+    osc.start(now)
+    osc.stop(now + duration)
+    this.riserOsc = osc
+  }
+
+  stopRiser() {
+    if (this.riserOsc) {
+      try { this.riserOsc.stop() } catch (e) {}
+      this.riserOsc = null
+    }
+  }
+
+  playSuccessChime(theme) {
+    this.init()
+    if (theme === 'mute') return
+    const now = this.ctx.currentTime
+    
+    if (theme === 'clinical') {
+      // Warm, sacred Sol-Do-Mi-Sol Hospital Chime with soft background pad
+      const notes = [392.00, 523.25, 659.25, 783.99] // G4, C5, E5, G5
+      notes.forEach((freq, index) => {
+        const osc = this.ctx.createOscillator()
+        const gain = this.ctx.createGain()
+        osc.type = 'sine'
+        osc.frequency.setValueAtTime(freq, now + index * 0.25)
+        gain.gain.setValueAtTime(0.12, now + index * 0.25)
+        gain.gain.exponentialRampToValueAtTime(0.001, now + index * 0.25 + 2.0)
+        osc.connect(gain)
+        gain.connect(this.ctx.destination)
+        osc.start(now + index * 0.25)
+        osc.stop(now + index * 0.25 + 2.0)
+      })
+
+      // Warm background organ pad
+      const padFreqs = [261.63, 329.63, 392.00] // C4 triad
+      padFreqs.forEach(freq => {
+        const osc = this.ctx.createOscillator()
+        const gain = this.ctx.createGain()
+        osc.type = 'triangle'
+        osc.frequency.setValueAtTime(freq, now)
+        gain.gain.setValueAtTime(0.04, now)
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 3.5)
+        osc.connect(gain)
+        gain.connect(this.ctx.destination)
+        osc.start(now)
+        osc.stop(now + 3.5)
+      })
+    } else if (theme === 'orchestral') {
+      // Majestic Orchestral Fanfare Brass Chord + Gold Wind Chimes + Deep Gong
+      const brassFreqs = [130.81, 196.00, 261.63, 329.63, 392.00, 523.25] // Grand C Major Chord (C3, G3, C4, E4, G4, C5)
+      brassFreqs.forEach((freq, index) => {
+        const osc = this.ctx.createOscillator()
+        const gain = this.ctx.createGain()
+        osc.type = 'triangle'
+        osc.frequency.setValueAtTime(freq, now)
+        
+        // Crescendo and dramatic sustain!
+        gain.gain.setValueAtTime(0.02, now)
+        gain.gain.linearRampToValueAtTime(0.16, now + 0.4) // Loud accent!
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 4.0)
+        
+        osc.connect(gain)
+        gain.connect(this.ctx.destination)
+        osc.start(now)
+        osc.stop(now + 4.0)
+      })
+
+      // Gold wind chimes glittering cascade
+      for (let i = 0; i < 20; i++) {
+        const osc = this.ctx.createOscillator()
+        const gain = this.ctx.createGain()
+        osc.type = 'sine'
+        const pitch = 1800 + i * 120 // 1.8kHz to 4.2kHz
+        const offset = i * 0.06
+        osc.frequency.setValueAtTime(pitch, now + offset)
+        gain.gain.setValueAtTime(0.02, now + offset)
+        gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.8)
+        osc.connect(gain)
+        gain.connect(this.ctx.destination)
+        osc.start(now + offset)
+        osc.stop(now + offset + 0.8)
+      }
+
+      // Massive ceremonial Gong thud (Deep sub-bass rumble)
+      this.thud(now, 48, 3.5)
+      this.thud(now + 0.1, 36, 3.0) // Second octave deep resonance
+
+      // High-Fidelity Crowd Applause & Clapping Simulator (White Noise + Bandpass Filter)
+      try {
+        const bufferSize = this.ctx.sampleRate * 4.5 // 4.5 seconds of applause
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate)
+        const data = buffer.getChannelData(0)
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1
+        }
+
+        const noiseNode = this.ctx.createBufferSource()
+        noiseNode.buffer = buffer
+
+        // Bandpass filter centered around clapping frequencies (900Hz to 1.8kHz)
+        const filterNode = this.ctx.createBiquadFilter()
+        filterNode.type = 'bandpass'
+        filterNode.frequency.setValueAtTime(1300, now)
+        filterNode.Q.setValueAtTime(1.2, now)
+
+        // Slow rise to simulate crowd react time, then exponential decay
+        const applauseGain = this.ctx.createGain()
+        applauseGain.gain.setValueAtTime(0.001, now)
+        applauseGain.gain.linearRampToValueAtTime(0.06, now + 0.6) // swells to peak
+        applauseGain.gain.linearRampToValueAtTime(0.04, now + 2.5) // sustained cheer
+        applauseGain.gain.exponentialRampToValueAtTime(0.001, now + 4.5) // decay
+
+        noiseNode.connect(filterNode)
+        filterNode.connect(applauseGain)
+        applauseGain.connect(this.ctx.destination)
+
+        noiseNode.start(now)
+        noiseNode.stop(now + 4.5)
+
+        // Generate individual crisp handclaps in foreground (short bandpass filtered sound clicks)
+        for (let j = 0; j < 12; j++) {
+          const clapTime = now + 0.2 + Math.random() * 2.0 // randomly scattered in the first 2.2s
+          const clapOsc = this.ctx.createOscillator()
+          const clapGain = this.ctx.createGain()
+          clapOsc.type = 'triangle'
+          clapOsc.frequency.setValueAtTime(350 + Math.random() * 100, clapTime)
+          clapGain.gain.setValueAtTime(0.05, clapTime)
+          clapGain.gain.exponentialRampToValueAtTime(0.001, clapTime + 0.08) // extremely short pulse
+          clapOsc.connect(clapGain)
+          clapGain.connect(this.ctx.destination)
+          clapOsc.start(clapTime)
+          clapOsc.stop(clapTime + 0.08)
+        }
+      } catch (err) {
+        console.error("Applause generator failed", err)
+      }
+    } else {
+      // Futuristic Sub-Bass Drop + Shimmering Glass Harp + Laser Scans
+      const cyberNotes = [261.63, 392.00, 523.25, 783.99, 1046.50, 1567.98] // C4, G4, C5, G5, C6, G6
+      cyberNotes.forEach((freq, index) => {
+        const osc = this.ctx.createOscillator()
+        const gain = this.ctx.createGain()
+        osc.type = 'triangle'
+        osc.frequency.setValueAtTime(freq, now + index * 0.08)
+        gain.gain.setValueAtTime(0.12, now + index * 0.08)
+        gain.gain.exponentialRampToValueAtTime(0.001, now + index * 0.08 + 3.0)
+        osc.connect(gain)
+        gain.connect(this.ctx.destination)
+        osc.start(now + index * 0.08)
+        osc.stop(now + index * 0.08 + 3.0)
+      })
+
+      // Massive Apple-Style Cinematic Sub-Bass Drop
+      this.thud(now, 60, 2.8)
+      
+      // Futuristic high-speed laser rise-and-fall sweep
+      const laser = this.ctx.createOscillator()
+      const laserGain = this.ctx.createGain()
+      laser.type = 'sine'
+      laser.frequency.setValueAtTime(100, now)
+      laser.frequency.exponentialRampToValueAtTime(1800, now + 1.2)
+      laserGain.gain.setValueAtTime(0.04, now)
+      laserGain.gain.exponentialRampToValueAtTime(0.001, now + 1.2)
+      laser.connect(laserGain)
+      laserGain.connect(this.ctx.destination)
+      laser.start(now)
+      laser.stop(now + 1.2)
+    }
+  }
+
+  playSignatureChime(theme) {
+    this.init()
+    if (theme === 'mute') return
+    const now = this.ctx.currentTime
+    
+    if (theme === 'clinical') {
+      // Healthy rhythmic heartbeat double thump + shimmering recovery bell
+      this.thud(now, 75, 0.3)
+      this.thud(now + 0.15, 60, 0.25)
+      
+      // Angelic healing chime
+      const notes = [523.25, 659.25, 783.99, 1046.50] // C5, E5, G5, C6
+      notes.forEach((freq, index) => {
+        const osc = this.ctx.createOscillator()
+        const gain = this.ctx.createGain()
+        osc.type = 'sine'
+        osc.frequency.setValueAtTime(freq, now + 0.3 + index * 0.1)
+        gain.gain.setValueAtTime(0.08, now + 0.3 + index * 0.1)
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3 + index * 0.1 + 1.5)
+        osc.connect(gain)
+        gain.connect(this.ctx.destination)
+        osc.start(now + 0.3 + index * 0.1)
+        osc.stop(now + 0.3 + index * 0.1 + 1.5)
+      })
+    } else if (theme === 'orchestral') {
+      // Upward majestic brass scale (G4 -> A4 -> B4 -> C5 -> D5 -> E5)
+      const freqs = [392.00, 440.00, 493.88, 523.25, 587.33, 659.25]
+      freqs.forEach((freq, index) => {
+        const osc = this.ctx.createOscillator()
+        const gain = this.ctx.createGain()
+        osc.type = 'triangle'
+        osc.frequency.setValueAtTime(freq, now + index * 0.12)
+        gain.gain.setValueAtTime(0.14, now + index * 0.12)
+        gain.gain.exponentialRampToValueAtTime(0.001, now + index * 0.12 + 1.5)
+        osc.connect(gain)
+        gain.connect(this.ctx.destination)
+        osc.start(now + index * 0.12)
+        osc.stop(now + index * 0.12 + 1.5)
+      })
+
+      // Grand majestic gold chime impact at peak
+      const peakOsc = this.ctx.createOscillator()
+      const peakGain = this.ctx.createGain()
+      peakOsc.type = 'sine'
+      peakOsc.frequency.setValueAtTime(1046.50, now + 0.72) // C6 peak bell
+      peakGain.gain.setValueAtTime(0.18, now + 0.72)
+      peakGain.gain.exponentialRampToValueAtTime(0.001, now + 0.72 + 2.0)
+      peakOsc.connect(peakGain)
+      peakGain.connect(this.ctx.destination)
+      peakOsc.start(now + 0.72)
+      peakOsc.stop(now + 0.72 + 2.0)
+    } else {
+      // Gebrakan Tembakan Laser Energi (Cyber Laser Blast & Sci-Fi Impact)
+      
+      // Step 1: Laser Charge-up (0.0s to 0.4s) - Accumulating digital power
+      const chargeOsc = this.ctx.createOscillator()
+      const chargeGain = this.ctx.createGain()
+      chargeOsc.type = 'sawtooth'
+      chargeOsc.frequency.setValueAtTime(150, now)
+      chargeOsc.frequency.exponentialRampToValueAtTime(1200, now + 0.4)
+      chargeGain.gain.setValueAtTime(0.01, now)
+      chargeGain.gain.linearRampToValueAtTime(0.06, now + 0.4)
+      chargeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.45)
+      
+      const chargeFilter = this.ctx.createBiquadFilter()
+      chargeFilter.type = 'lowpass'
+      chargeFilter.frequency.setValueAtTime(400, now)
+      chargeFilter.frequency.exponentialRampToValueAtTime(2000, now + 0.4)
+      
+      chargeOsc.connect(chargeFilter)
+      chargeFilter.connect(chargeGain)
+      chargeGain.connect(this.ctx.destination)
+      chargeOsc.start(now)
+      chargeOsc.stop(now + 0.45)
+
+      // Step 2: Core Laser Blast Discharge (0.4s to 1.6s) - Extreme sci-fi frequency dive!
+      const blastOsc = this.ctx.createOscillator()
+      const blastGain = this.ctx.createGain()
+      blastOsc.type = 'sawtooth'
+      blastOsc.frequency.setValueAtTime(2800, now + 0.4)
+      blastOsc.frequency.exponentialRampToValueAtTime(75, now + 1.4) // massive plunge!
+      
+      const blastFilter = this.ctx.createBiquadFilter()
+      blastFilter.type = 'lowpass'
+      blastFilter.frequency.setValueAtTime(3000, now + 0.4)
+      blastFilter.frequency.exponentialRampToValueAtTime(150, now + 1.4) // swept filter!
+      
+      blastGain.gain.setValueAtTime(0.12, now + 0.4)
+      blastGain.gain.exponentialRampToValueAtTime(0.001, now + 1.6)
+      
+      blastOsc.connect(blastFilter)
+      blastFilter.connect(blastGain)
+      blastGain.connect(this.ctx.destination)
+      blastOsc.start(now + 0.4)
+      blastOsc.stop(now + 1.6)
+
+      // Step 3: Sci-Fi Sub-Bass Impact Thump (0.4s to 2.0s) - Room-shaking energy bass wave
+      this.thud(now + 0.4, 52, 1.8)
+    }
+  }
+
+  playClosingChime(theme) {
+    this.init()
+    if (theme === 'mute') return
+    const now = this.ctx.currentTime
+
+    if (theme === 'clinical') {
+      // Warm, professional clinical sign-off: Sol-Do (G4 -> C4)
+      const notes = [392.00, 261.63] // G4, C4
+      notes.forEach((freq, index) => {
+        const osc = this.ctx.createOscillator()
+        const gain = this.ctx.createGain()
+        osc.type = 'sine'
+        osc.frequency.setValueAtTime(freq, now + index * 0.3)
+        gain.gain.setValueAtTime(0.08, now + index * 0.3)
+        gain.gain.exponentialRampToValueAtTime(0.001, now + index * 0.3 + 1.8)
+        osc.connect(gain)
+        gain.connect(this.ctx.destination)
+        osc.start(now + index * 0.3)
+        osc.stop(now + index * 0.3 + 1.8)
+      })
+    } else if (theme === 'orchestral') {
+      // Soft, lingering orchestral string triad chord fade-out with a descending wind chime sweep
+      const freqs = [130.81, 164.81, 196.00, 261.63] // C3, E3, G3, C4
+      freqs.forEach(freq => {
+        const osc = this.ctx.createOscillator()
+        const gain = this.ctx.createGain()
+        osc.type = 'triangle'
+        osc.frequency.setValueAtTime(freq, now)
+        gain.gain.setValueAtTime(0.06, now)
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 2.5)
+        osc.connect(gain)
+        gain.connect(this.ctx.destination)
+        osc.start(now)
+        osc.stop(now + 2.5)
+      })
+
+      // Light, descending wind chimes sweep
+      for (let i = 0; i < 8; i++) {
+        const osc = this.ctx.createOscillator()
+        const gain = this.ctx.createGain()
+        osc.type = 'sine'
+        const pitch = 3000 - i * 200 // 3kHz down to 1.6kHz
+        const offset = i * 0.1
+        osc.frequency.setValueAtTime(pitch, now + offset)
+        gain.gain.setValueAtTime(0.012, now + offset)
+        gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.6)
+        osc.connect(gain)
+        gain.connect(this.ctx.destination)
+        osc.start(now + offset)
+        osc.stop(now + offset + 0.6)
+      }
+    } else {
+      // Sci-fi power-down sweep (600Hz down to 90Hz) with a gentle interface click
+      const sweep = this.ctx.createOscillator()
+      const gain = this.ctx.createGain()
+      sweep.type = 'sine'
+      sweep.frequency.setValueAtTime(600, now)
+      sweep.frequency.exponentialRampToValueAtTime(90, now + 1.2)
+      gain.gain.setValueAtTime(0.05, now)
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2)
+      sweep.connect(gain)
+      gain.connect(this.ctx.destination)
+      sweep.start(now)
+      sweep.stop(now + 1.2)
+
+      // Soft click
+      const click = this.ctx.createOscillator()
+      const clickGain = this.ctx.createGain()
+      click.type = 'triangle'
+      click.frequency.setValueAtTime(150, now)
+      clickGain.gain.setValueAtTime(0.04, now)
+      clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05)
+      click.connect(clickGain)
+      clickGain.connect(this.ctx.destination)
+      click.start(now)
+      click.stop(now + 0.05)
+    }
+  }
+
+  startReflectionPad() {
+    this.init()
+    this.stopReflectionPad()
+    const now = this.ctx.currentTime
+    
+    // Continuous deep warm C major 7th chord drone (C3, E3, G3, B3)
+    const freqs = [130.81, 164.81, 196.00, 246.94]
+    this.padOscs = []
+    this.padGains = []
+    
+    freqs.forEach(freq => {
+      const osc = this.ctx.createOscillator()
+      const gain = this.ctx.createGain()
+      
+      osc.type = 'triangle'
+      osc.frequency.setValueAtTime(freq, now)
+      
+      // Warm, barely-audible volume setting underneath narration
+      gain.gain.setValueAtTime(0.001, now)
+      gain.gain.linearRampToValueAtTime(0.015, now + 2.0) // 2-second fade-in
+      
+      osc.connect(gain)
+      gain.connect(this.ctx.destination)
+      
+      osc.start(now)
+      this.padOscs.push(osc)
+      this.padGains.push(gain)
+    })
+  }
+
+  stopReflectionPad() {
+    if (this.padOscs && this.padOscs.length > 0) {
+      const now = this.ctx ? this.ctx.currentTime : 0
+      this.padOscs.forEach((osc, index) => {
+        const gain = this.padGains[index]
+        if (gain && this.ctx) {
+          try {
+            gain.gain.setValueAtTime(gain.gain.value, now)
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2) // smooth 1.2-second fade out
+            setTimeout(() => {
+              try { osc.stop() } catch (e) {}
+            }, 1300)
+          } catch (e) {
+            try { osc.stop() } catch (e) {}
+          }
+        } else {
+          try { osc.stop() } catch (e) {}
+        }
+      })
+      this.padOscs = []
+      this.padGains = []
+    }
+  }
+}
+
+// =========================================================
+// INTEGRATED AUDIO MANAGER (WITH OPTIONAL FILE-FALLBACK)
+// =========================================================
+const synth = new NativeSynthesizer()
+
+// Set this to true ONLY if you have placed physical MP3 files in public/sounds/
+// This prevents the browser from logging ugly 404/decode warnings in the console by default.
+const usePhysicalAudioFiles = false
+
+const audioFiles = usePhysicalAudioFiles ? {
+  heartbeat: new Audio('/sounds/heartbeat.mp3'),
+  whoosh: new Audio('/sounds/cyber-whoosh.mp3'),
+  riser: new Audio('/sounds/orchestral-riser.mp3'),
+  fanfare: new Audio('/sounds/triumphant-fanfare.mp3'),
+  signature: new Audio('/sounds/gold-chime.mp3')
+} : null
+
+if (usePhysicalAudioFiles && audioFiles) {
+  audioFiles.heartbeat.loop = true
+  audioFiles.heartbeat.volume = 0.4
+  audioFiles.whoosh.volume = 0.5
+  audioFiles.riser.volume = 0.6
+  audioFiles.fanfare.volume = 0.8
+  audioFiles.signature.volume = 0.6
+}
+
+const audioManager = {
+  playWelcomingIntro() {
+    const s = store.sessionSoundConsole.standby
+    if (s === 'mute') return
+    synth.playWelcomingIntro(s)
+  },
+  startHeartbeat() {
+    const s = store.sessionSoundConsole.standby
+    if (s === 'mute') return
+    if (usePhysicalAudioFiles && audioFiles) {
+      audioFiles.heartbeat.play()
+        .catch(() => {
+          synth.playHeartbeat(s)
+        })
+    } else {
+      synth.playHeartbeat(s)
+    }
+  },
+  stopHeartbeat() {
+    if (usePhysicalAudioFiles && audioFiles) {
+      audioFiles.heartbeat.pause()
+      audioFiles.heartbeat.currentTime = 0
+    }
+    synth.stopHeartbeat()
+  },
+  playLaunchWhoosh() {
+    const s = store.sessionSoundConsole.loading
+    if (s === 'mute') return
+    if (usePhysicalAudioFiles && audioFiles) {
+      audioFiles.whoosh.play()
+        .catch(() => {
+          synth.playLaunchStart(s)
+        })
+    } else {
+      synth.playLaunchStart(s)
+    }
+  },
+  playRiser(durationSec) {
+    const s = store.sessionSoundConsole.loading
+    if (s === 'mute') return
+    if (usePhysicalAudioFiles && audioFiles) {
+      audioFiles.riser.play()
+        .catch(() => {
+          synth.playRiser(s, durationSec)
+        })
+    } else {
+      synth.playRiser(s, durationSec)
+    }
+  },
+  stopRiser() {
+    if (usePhysicalAudioFiles && audioFiles) {
+      audioFiles.riser.pause()
+      audioFiles.riser.currentTime = 0
+    }
+    synth.stopRiser()
+  },
+  playSuccess() {
+    this.stopRiser()
+    const s = store.sessionSoundConsole.success
+    if (s === 'mute') return
+    if (usePhysicalAudioFiles && audioFiles) {
+      audioFiles.fanfare.play()
+        .catch(() => {
+          synth.playSuccessChime(s)
+        })
+    } else {
+      synth.playSuccessChime(s)
+    }
+  },
+  playSignature() {
+    const s = store.sessionSoundConsole.signature
+    if (s === 'mute') return
+    if (usePhysicalAudioFiles && audioFiles) {
+      audioFiles.signature.play()
+        .catch(() => {
+          synth.playSignatureChime(s)
+        })
+    } else {
+      synth.playSignatureChime(s)
+    }
+  },
+  playClosing() {
+    const s = store.sessionSoundConsole.loading
+    if (s === 'mute') return
+    synth.playClosingChime(s)
+  },
+  playReflectionBGM() {
+    const s = store.sessionSoundConsole.narrator
+    if (s === 'mute') return
+    synth.startReflectionPad()
+  },
+  stopReflectionBGM() {
+    synth.stopReflectionPad()
+  }
+}
+
+// =========================================================
+// REACTIVE COMPONENT STATE
+// =========================================================
+const store = useActivationStore()
+const isLaunching = ref(false)
+const progressPercentage = ref(0)
+const activeStatusMessage = ref('')
+const errorMessage = ref('')
+const hasSigned = ref(false)
+
+// Centennial Narrative Slideshow State
+const reflections = [
+  "100 Tahun Pemanfaatan Rumah Sakit. Satu abad perjalanan ini bukan sekadar hitungan waktu, tetapi menjadi bukti nyata pengabdian, pelayanan, perjuangan, dan dedikasi rumah sakit dalam memberikan pelayanan kesehatan kepada masyarakat.",
+  "Selama seratus tahun, rumah sakit telah menjadi tempat lahirnya harapan, tempat bertumbuhnya kehidupan, serta tempat masyarakat memperoleh pelayanan, perhatian, dan kepedulian. Berbagai tantangan telah dilalui, mulai dari keterbatasan sarana di masa awal berdiri, perkembangan ilmu pengetahuan dan teknologi kesehatan, hingga menghadapi berbagai dinamika pelayanan kesehatan modern. Semua itu dijalani dengan semangat kemানুsiaan dan komitmen untuk terus melayani.",
+  "Peringatan 100 tahun ini menjadi momentum refleksi untuk mengenang jasa para pendahulu, pimpinan, tenaga kesehatan, pegawai, dan seluruh pihak yang telah memberikan kontribusi terbaik demi kemajuan rumah sakit. Dari generasi ke generasi, semangat pengabdian terus diwariskan untuk menghadirkan pelayanan kesehatan yang berkualitas, aman, profesional, dan berorientasi pada keselamatan pasien.",
+  "Melalui peringatan satu abad ini, kita tidak hanya merayakan perjalanan panjang rumah sakit, tetapi juga meneguhkan komitmen untuk terus bertransformasi menghadapi masa depan. Dengan perkembangan teknologi, peningkatan mutu layanan, penguatan sumber daya manusia, serta kolaborasi bersama masyarakat, rumah sakit diharapkan mampu terus menjadi institusi pelayanan kesehatan yang terpercaya dan membanggakan.",
+  "Kiranya peringatan 100 Tahun Pemanfaatan Rumah Sakit ini menjadi sumber motivasi bagi seluruh jajaran untuk terus berkarya, mengabdi, dan memberikan pelayanan terbaik bagi masyarakat. Semoga rumah sakit ini semakin maju, humanis, profesional, dan tetap menjadi tempat yang menghadirkan harapan serta kehidupan bagi semua."
+]
+
+const currentReflectionIndex = ref(0)
+const isReflectionPlaying = ref(false)
+
+const speakNarration = (text) => {
+  // Cancel any ongoing speech synthesis first
+  window.speechSynthesis.cancel()
+
+  if (activeSoundTheme.value === 'mute') return
+
+  const utterance = new SpeechSynthesisUtterance(text)
+  utterance.lang = 'id-ID'
+  
+  // Try to find native Indonesian voices
+  const voices = window.speechSynthesis.getVoices()
+  const indonesianVoices = voices.filter(v => v.lang.startsWith('id') || v.lang.startsWith('id-ID'))
+  
+  // Dynamic Character Selector
+  if (activeVoiceCharacter.value === 'female-warm') {
+    // 👩 Karakter "Ibu Narator Hangat" (Lembut & Menyentuh Kalbu)
+    const selectedVoice = indonesianVoices.find(v => 
+      v.name.toLowerCase().includes('female') || 
+      v.name.toLowerCase().includes('google') || 
+      v.name.toLowerCase().includes('gadis') || 
+      v.name.toLowerCase().includes('srikandi') || 
+      v.name.toLowerCase().includes('indira')
+    ) || indonesianVoices[0]
+
+    if (selectedVoice) utterance.voice = selectedVoice
+    utterance.rate = 0.87  // Soft warm rate
+    utterance.pitch = 0.98 // Deep soothing female pitch
+  } else if (activeVoiceCharacter.value === 'male-protocol') {
+    // 🤵 Karakter "Protokoler Istana" (Pria — Gagah & Berwibawa)
+    const selectedVoice = indonesianVoices.find(v => 
+      v.name.toLowerCase().includes('male') || 
+      v.name.toLowerCase().includes('pria') || 
+      v.name.toLowerCase().includes('wira') || 
+      v.name.toLowerCase().includes('damora')
+    ) || indonesianVoices[0]
+
+    if (selectedVoice) utterance.voice = selectedVoice
+    utterance.rate = 0.83  // Solemn slow rate
+    utterance.pitch = 0.85 // Heavy deep bass pitch
+  } else {
+    // 🤖 Karakter "Asisten Virtual Masa Depan" (Siber — Cerdas & Presisi)
+    const selectedVoice = indonesianVoices.find(v => 
+      v.name.toLowerCase().includes('female') || 
+      v.name.toLowerCase().includes('google') || 
+      v.name.toLowerCase().includes('srikandi')
+    ) || indonesianVoices[0]
+
+    if (selectedVoice) utterance.voice = selectedVoice
+    utterance.rate = 0.92  // Agile fast rate
+    utterance.pitch = 1.15 // Futuristic higher pitch
+  }
+
+  // When speech ends, automatically transition to next slide if auto-play is running!
+  utterance.onend = () => {
+    if (isReflectionPlaying.value) {
+      if (currentReflectionIndex.value < reflections.length - 1) {
+        currentReflectionIndex.value++
+        speakNarration(reflections[currentReflectionIndex.value])
+      } else {
+        // Completed all paragraphs, stop everything!
+        stopReflectionAutoPlay()
+        audioManager.stopReflectionBGM()
+      }
+    }
+  }
+
+  window.speechSynthesis.speak(utterance)
+}
+
+const startReflectionAutoPlay = () => {
+  stopReflectionAutoPlay()
+  isReflectionPlaying.value = true
+  speakNarration(reflections[currentReflectionIndex.value])
+}
+
+const stopReflectionAutoPlay = () => {
+  isReflectionPlaying.value = false
+  window.speechSynthesis.cancel()
+}
+
+const toggleReflectionAutoPlay = () => {
+  if (isReflectionPlaying.value) {
+    stopReflectionAutoPlay()
+  } else {
+    startReflectionAutoPlay()
+  }
+}
+
+const nextReflection = () => {
+  stopReflectionAutoPlay()
+  if (currentReflectionIndex.value < reflections.length - 1) {
+    currentReflectionIndex.value++
+    speakNarration(reflections[currentReflectionIndex.value])
+  }
+}
+
+const prevReflection = () => {
+  stopReflectionAutoPlay()
+  if (currentReflectionIndex.value > 0) {
+    currentReflectionIndex.value--
+    speakNarration(reflections[currentReflectionIndex.value])
+  }
+}
+
+// Reactive Sound Theme and Voice Character bound to the global Pinia Store's custom session console
+const activeSoundTheme = computed(() => store.sessionSoundConsole.standby)
+const activeVoiceCharacter = computed(() => store.sessionSoundConsole.narrator)
+
+// Watch for real-time acoustic theme changes from the global Studio Tema sidebar!
+watch(activeSoundTheme, () => {
+  if (!isLaunching.value && !store.isActivated) {
+    audioManager.stopHeartbeat()
+    audioManager.playWelcomingIntro()
+    audioManager.startHeartbeat()
+  }
+})
+
+// Watch for voice character adjustments to transition spoken character in real-time
+watch(activeVoiceCharacter, () => {
+  if (isReflectionPlaying.value) {
+    speakNarration(reflections[currentReflectionIndex.value])
+  }
+})
+
+const statusMessages = [
+  "Menerima denyut nadi VVIP...",
+  "Menyalurkan energi EKG emas satu abad...",
+  "Membentuk angka monumental 100 Tahun...",
+  "Memetakan siluet arsitektur modern RSUD...",
+  "Mengaktifkan Portal Paripurna Digital...",
+  "Menyelesaikan sertifikasi peresmian..."
+]
+
+// =========================================================
+// LIFECYCLE & GESTURE HOOKS (AUTOPLAY POLICY COMPLIANT)
+// =========================================================
+const initializeAudioOnGesture = () => {
+  audioManager.playWelcomingIntro()
+  audioManager.startHeartbeat()
+  
+  // Clean up gesture listeners once activated
+  window.removeEventListener('click', initializeAudioOnGesture)
+  window.removeEventListener('pointerdown', initializeAudioOnGesture)
+  window.removeEventListener('keydown', initializeAudioOnGesture)
+}
+
+onMounted(() => {
+  // Listen to the first user interaction anywhere on the screen to boot audio without warnings
+  window.addEventListener('click', initializeAudioOnGesture)
+  window.addEventListener('pointerdown', initializeAudioOnGesture)
+  window.addEventListener('keydown', initializeAudioOnGesture)
+})
+
+onUnmounted(() => {
+  // Clean up remaining listeners and stop all playbacks to prevent leaks
+  window.removeEventListener('click', initializeAudioOnGesture)
+  window.removeEventListener('pointerdown', initializeAudioOnGesture)
+  window.removeEventListener('keydown', initializeAudioOnGesture)
+  
+  stopReflectionAutoPlay()
+  audioManager.stopReflectionBGM()
+  audioManager.stopHeartbeat()
+  audioManager.stopRiser()
+})
+
+// =========================================================
+// CORE FUNCTIONS
+// =========================================================
+const startCinematicLaunch = () => {
+  isLaunching.value = true
+  progressPercentage.value = 0
+  activeStatusMessage.value = statusMessages[0]
+  errorMessage.value = ''
+
+  // Transition sounds: Stop heartbeat, play cyber whoosh and launch riser
+  audioManager.stopHeartbeat()
+  audioManager.playLaunchWhoosh()
+  audioManager.playRiser(6.0) // 6 seconds duration riser
+
+  // Animate progress details & trace steps over 6 seconds
+  let duration = 6000 // 6s
+  let intervalMs = 100
+  let steps = duration / intervalMs
+  let currentStep = 0
+
+  const progressInterval = setInterval(() => {
+    currentStep++
+    progressPercentage.value = Math.min((currentStep / steps) * 100, 100)
+    
+    // Switch messages sequentially
+    let messageIndex = Math.floor((currentStep / steps) * statusMessages.length)
+    if (messageIndex < statusMessages.length) {
+      activeStatusMessage.value = statusMessages[messageIndex]
+    }
+
+    if (currentStep >= steps) {
+      clearInterval(progressInterval)
+      finalizeActivation()
+    }
+  }, intervalMs)
+}
+
+const finalizeActivation = async () => {
+  const result = await store.activateApp('ACT-RS100')
+  if (!result.success) {
+    errorMessage.value = result.error
+    isLaunching.value = false
+    audioManager.stopRiser()
+    audioManager.startHeartbeat() // Resume standby heartbeat on fail
+  } else {
+    // Play triumphant success fanfare!
+    audioManager.playSuccess()
+  }
+}
+
+const drawSignature = () => {
+  hasSigned.value = true
+  audioManager.playSignature()
+  
+  // Smoothly trigger reflection drone BGM and start autoplay slide 1.6s after blast
+  setTimeout(() => {
+    if (hasSigned.value) {
+      audioManager.playReflectionBGM()
+      startReflectionAutoPlay()
+    }
+  }, 1600)
+}
+
+const resetEverything = () => {
+  store.resetActivation()
+  isLaunching.value = false
+  progressPercentage.value = 0
+  errorMessage.value = ''
+  hasSigned.value = false
+  currentReflectionIndex.value = 0
+  stopReflectionAutoPlay()
+  audioManager.stopReflectionBGM()
+  audioManager.stopRiser()
+  audioManager.playClosing() // Play the beautiful theme-based closing sound!
+  
+  // Wait 1.5 seconds for the closing sound to fade out elegantly before resuming the standby heartbeat
+  setTimeout(() => {
+    if (!isLaunching.value && !store.isActivated) {
+      audioManager.startHeartbeat()
+    }
+  }, 1500)
+}
+</script>
+
+<style lang="scss" scoped>
+.launching-page {
+  min-height: 85vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background: radial-gradient(circle at center, #0B301D 0%, #03140A 100%); // Rich emerald obsidian green gradient
+}
+
+.interactive-container {
+  width: 100%;
+  max-width: 900px;
+}
+
+// Phase 1 Lockscreen Styles
+.verification-panel {
+  text-align: center;
+  max-width: 500px;
+  margin: 0 auto;
+  border-color: rgba(247, 150, 51, 0.3);
+
+  .lock-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  h2 {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .desc {
+    color: #94A3B8;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+  }
+}
+
+.input-display {
+  margin-bottom: 1.5rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  
+  .code-input {
+    width: 100%;
+    background: rgba(3, 20, 10, 0.85);
+    border: 2px solid rgba(247, 150, 51, 0.3);
+    padding: 1rem 3.5rem 1rem 1rem; // Extra padding right for the toggle button
+    border-radius: 8px;
+    font-size: 1.5rem;
+    text-align: center;
+    color: #FFC385;
+    letter-spacing: 4px;
+    outline: none;
+
+    &:focus {
+      border-color: #F79633;
+    }
+  }
+
+  .visibility-btn {
+    position: absolute;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    color: rgba(247, 150, 51, 0.6);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    transition: color 0.2s, transform 0.2s;
+    z-index: 5;
+
+    &:hover {
+      color: #F79633;
+      transform: scale(1.1);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+    
+    .eye-icon {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  max-width: 320px;
+  margin: 0 auto 1.5rem;
+}
+
+.key-btn {
+  background: rgba(11, 48, 29, 0.6);
+  border: 1px solid rgba(247, 150, 51, 0.15);
+  color: #FFC385;
+  font-size: 1.25rem;
+  font-weight: 700;
+  padding: 1rem 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(247, 150, 51, 0.15);
+    border-color: #F79633;
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &.action-key {
+    background: rgba(247, 150, 51, 0.15);
+    border-color: rgba(247, 150, 51, 0.4);
+    font-size: 1rem;
+    color: #ffffff;
+
+    &:hover {
+      background: #F79633;
+      color: #03140A;
+    }
+  }
+}
+
+.error-msg {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.hint {
+  color: #64748B;
+  font-size: 0.8rem;
+}
+
+// Phase 2 Cinematic Setup
+.launcher-panel {
+  text-align: center;
+
+  .instructions {
+    margin-bottom: 3rem;
+
+    .gold-subtitle {
+      font-size: 1.8rem;
+      color: #F79633; // Orange-Gold
+      letter-spacing: 4px;
+      margin-bottom: 1rem;
+      font-weight: 800;
+    }
+
+    .touch-call {
+      font-size: 1.25rem;
+      color: #FFC385;
+      margin-top: 0.5rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+  }
+}
+
+.sensor-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  width: 100%;
+}
+
+// Beating Heart Touch Button Styles
+.heart-sensor {
+  position: relative;
+  width: 250px;
+  height: 250px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .heart-icon-wrap {
+    width: 140px;
+    height: 140px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .beating-heart {
+    width: 100%;
+    height: 100%;
+    animation: heartbeat-vibe 1.2s infinite cubic-bezier(0.215, 0.610, 0.355, 1);
+    filter: drop-shadow(0 0 15px rgba(247, 150, 51, 0.6));
+  }
+
+  .heart-label {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: #FFC385;
+    letter-spacing: 2px;
+    margin-top: 1.5rem;
+    z-index: 10;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  }
+
+  .pulse-ring {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 2px solid rgba(247, 150, 51, 0.3);
+    top: 15px;
+    opacity: 0.8;
+    transform: scale(1);
+    box-shadow: 0 0 20px rgba(247, 150, 51, 0.2);
+
+    &.r1 { animation: pulse-ring-glow 3s infinite 0s; }
+    &.r2 { animation: pulse-ring-glow 3s infinite 1s; }
+    &.r3 { animation: pulse-ring-glow 3s infinite 2s; }
+  }
+
+  &:hover {
+    .heart-icon-wrap {
+      transform: scale(1.1);
+    }
+    .beating-heart {
+      filter: drop-shadow(0 0 25px rgba(247, 150, 51, 0.9));
+    }
+  }
+}
+
+@keyframes heartbeat-vibe {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.1); }
+  40% { transform: scale(1.02); }
+  60% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+@keyframes pulse-ring-glow {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+// Cinematic Canvas Styles (Drawing ECG & Silhouette)
+.cinematic-canvas {
+  width: 100%;
+  max-width: 850px;
+  background: rgba(3, 20, 10, 0.85); // Emerald transparent dark canvas
+  border: 1px solid rgba(247, 150, 51, 0.2);
+  border-radius: 16px;
+  padding: 3rem 2rem 2rem;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 0 40px rgba(247, 150, 51, 0.05);
+  animation: fade-in-up 0.8s ease-out;
+
+  .ecg-svg {
+    width: 100%;
+    height: auto;
+  }
+}
+
+.path-element {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+}
+
+.path-ecg {
+  stroke: #00FF87; // TV Optimized High-Luminance Mint Emerald Green
+  stroke-width: 7.5; // Bold stroke for high readability on TVs
+  animation: draw-step 1.5s forwards ease-in-out;
+}
+
+.path-one {
+  stroke: #F79633; // Glowing Gold-Orange numbers
+  stroke-width: 7.5;
+  animation: draw-step 1.2s forwards ease-in-out 1.3s;
+}
+
+.path-zero-one {
+  stroke: #F79633;
+  stroke-width: 7.5;
+  animation: draw-step 1.2s forwards ease-in-out 2.1s;
+}
+
+.path-zero-two {
+  stroke: #F79633;
+  stroke-width: 7.5;
+  animation: draw-step 1.2s forwards ease-in-out 2.9s;
+}
+
+.path-building {
+  stroke: #00FF87; // TV Optimized High-Luminance Mint Emerald Green RS silhouette
+  stroke-width: 7.5;
+  animation: draw-step 1.6s forwards ease-in-out 3.7s;
+}
+
+.path-cross {
+  stroke: #FFFFFF; // Glowing Pure White Medical Cross
+  stroke-width: 8.5; // Highly prominent center-top cross
+  animation: draw-step 0.8s forwards ease-in-out 4.9s, heartbeat-cross-glow 1.5s infinite ease-in-out 5.6s;
+}
+
+@keyframes draw-step {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes heartbeat-cross-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px #FFFFFF);
+    stroke: #FFFFFF;
+  }
+  50% {
+    filter: drop-shadow(0 0 25px #FFFFFF);
+    stroke: #e6e6e6;
+  }
+}
+
+.cinematic-footer {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  .loader-track {
+    width: 100%;
+    max-width: 500px;
+    height: 4px;
+    background: rgba(247, 150, 51, 0.1);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .loader-fill {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #00A859, #F79633); // Green to Orange-Gold loading transition
+    box-shadow: 0 0 10px #F79633;
+    transition: width 0.1s linear;
+  }
+
+  .status-msg {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #FFC385;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+}
+
+// Phase 3 Celebration Plaque Styles
+.celebration-panel {
+  text-align: center;
+  animation: fade-in-up 1s ease;
+}
+
+.plaque-container {
+  border: 4px double #F79633;
+  border-radius: 20px;
+  background: radial-gradient(circle, #0B301D 0%, #03140A 100%); // Rich dark emerald background
+  padding: 4rem 3rem;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.8), inset 0 0 50px rgba(247,150,51,0.1);
+
+  .plaque-logo {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #FFC385;
+    font-weight: 700;
+  }
+
+  .plaque-divider {
+    height: 1px;
+    width: 200px;
+    background: linear-gradient(90deg, transparent, #F79633, transparent);
+    margin: 1.5rem auto;
+  }
+
+  .plaque-title {
+    font-size: 2.8rem;
+    letter-spacing: 6px;
+    margin-bottom: 2rem;
+  }
+
+  .plaque-declaration {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: #E2E8F0;
+    margin-bottom: 3rem;
+    max-width: 650px;
+    margin-left: auto;
+    margin-right: auto;
+
+    strong {
+      color: #FFC385;
+    }
+  }
+}
+
+.signature-block {
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+
+  .city-date {
+    font-size: 0.95rem;
+    color: #94A3B8;
+    margin-bottom: 0.75rem;
+    font-style: italic;
+  }
+
+  .signature-box {
+    width: 380px;
+    height: 130px;
+    border: 1px dashed rgba(247, 150, 51, 0.4);
+    background: rgba(3, 20, 10, 0.4);
+    border-radius: 12px;
+    margin: 0 auto 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.3s ease;
+
+    &:hover {
+      border-color: #F79633;
+    }
+
+    .sign-prompt {
+      font-size: 0.85rem;
+      color: #64748B;
+      padding: 1rem;
+    }
+
+    .signature-svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .signatory-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #FFC385;
+    letter-spacing: 1px;
+  }
+}
+
+.plaque-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(247, 150, 51, 0.15);
+  padding-top: 1.5rem;
+
+  .badge {
+    color: #F79633;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+  }
+
+  .reset-btn {
+    background: transparent;
+    border: 1px solid rgba(247, 150, 51, 0.2);
+    color: #94A3B8;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+  }
+}
+
+/* Centennial Reflection Narrative Panel Styles */
+.reflection-panel-card {
+  margin: 2.5rem auto 1.5rem;
+  max-width: 650px;
+  background: rgba(3, 20, 10, 0.7);
+  border: 1px solid rgba(247, 150, 51, 0.25);
+  border-radius: 14px;
+  padding: 1.5rem;
+  text-align: left;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 0 15px rgba(247, 150, 51, 0.05);
+  animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  .reflection-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(247, 150, 51, 0.15);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .reflection-tag {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+
+  .reflection-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .control-arrow-btn {
+    background: transparent;
+    border: none;
+    color: #FFC385;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: transform 0.2s;
+    padding: 0.2rem 0.4rem;
+
+    &:hover:not(:disabled) {
+      transform: scale(1.2);
+      color: #F79633;
+    }
+
+    &:disabled {
+      color: #4A5568;
+      cursor: not-allowed;
+    }
+  }
+
+  .control-count {
+    font-size: 0.8rem;
+    color: #94A3B8;
+    min-width: 45px;
+    text-align: center;
+  }
+
+  .control-play-btn {
+    background: rgba(247, 150, 51, 0.1);
+    border: 1px solid rgba(247, 150, 51, 0.3);
+    color: #FFC385;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+      background: rgba(247, 150, 51, 0.2);
+      border-color: #F79633;
+    }
+
+    &.active {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: #22c55e;
+      color: #4ade80;
+    }
+  }
+
+  .reflection-body {
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+  }
+
+  .reflection-text {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: #E2E8F0;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    transition: opacity 0.4s ease;
+  }
+}
+
+.animate-fade {
+  animation: fade-in-up 0.8s ease both;
+}
+
+/* Slide fade animation for Vue transitions */
+.slide-fade-enter-active {
+  transition: all 0.4s ease-out;
+}
+.slide-fade-leave-active {
+  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+}
+.slide-fade-enter-from {
+  transform: translateX(20px);
+  opacity: 0;
+}
+.slide-fade-leave-to {
+  transform: translateX(-20px);
+  opacity: 0;
+}
+</style>

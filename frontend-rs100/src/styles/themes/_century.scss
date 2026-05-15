@@ -1,0 +1,7 @@
+// themes/_century.scss
+
+// Custom themes for RSUD Aloei Saboe 100-year celebrations (e.g. historical styling parameters, antique borders, gold seals)
+.gold-seal {
+  border: 2px solid $color-gold;
+  box-shadow: 0 0 15px rgba($color-gold, 0.4);
+}
