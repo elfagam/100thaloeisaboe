@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend-rs100
+    container_name: rs100-backend
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./backend-rs100/gallery.json:/app/gallery.json
+      - ./backend-rs100/uploads:/app/uploads
+    restart: always
+
+  frontend:
+    build: ./frontend-rs100
+    container_name: rs100-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always

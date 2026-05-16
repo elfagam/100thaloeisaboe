@@ -7,7 +7,7 @@
         <div v-if="!isLaunching" class="instructions animate-fade">
           <h3 class="gold-subtitle">SISTEM SIAP DILUNCURKAN</h3>
           <p>Yth. Bapak Wali Kota Gorontalo,</p>
-          <p class="touch-call">Silakan Sentuh Ikon Jantung Di Bawah Untuk Memulai Peresmian</p>
+          <p class="touch-call">Silakan sentuh ikon jantung di bawah untuk memulai peresmian</p>
           
           <div v-if="errorMessage" class="error-msg" style="max-width: 500px; margin: 2rem auto 0;">
             ⚠️ {{ errorMessage }}
@@ -74,12 +74,13 @@
       <div v-else class="celebration-panel">
         
         <!-- 🚀 Launching Components Dashboard (Fase 2) -->
-        <transition name="slide-fade">
+        <transition name="slide-fade" mode="out-in">
           <div v-if="isActivated && !hasSigned" class="launch-dashboard-panel animate-fade">
             <div class="dashboard-card">
               <div class="dashboard-header">
-                <h2 class="font-historical">PANEL AKTIVASI PERESMIAN</h2>
+                <h2 class="font-historical">PERESMIAN</h2>
                 <p class="subtitle">SATU ABAD RSUD PROF. DR. H. ALOEI SABOE</p>
+                
               </div>
 
               <div class="components-grid">
@@ -99,9 +100,9 @@
                     <p>100 Tahun RSAS</p>
                   </div>
                 </div>
-                <div class="component-item active-comp">
+                <div class="component-item active-comp" @click="nextLogo" style="cursor: pointer;">
                   <div class="comp-icon">
-                    <img src="/LogoRSAS JPG/Logo_RSAS_0.jpg" alt="Logo RSAS 100 Tahun" class="comp-logo-img" />
+                    <img :src="logos[activeLogoIndex]" alt="Logo RSAS 100 Tahun" class="comp-logo-img" />
                   </div>
                   <div class="comp-info">
                     <h3>LOGO</h3>
@@ -137,7 +138,7 @@
         </transition>
 
         <!-- 📖 Centennial Reflection Narrative (Fase 3) -->
-        <transition name="slide-fade">
+        <transition name="slide-fade" mode="out-in">
           <div v-if="hasSigned" class="reflection-panel-card animate-fade">
             <video ref="reflectionVideo" class="reflection-video-bg" src="/Video-Narasi.mp4" playsinline loop muted></video>
             <video ref="reflectionAudio" src="/Video-Narasi.mp4" playsinline style="display: none;" @ended="onReflectionAudioEnded"></video>
@@ -178,7 +179,7 @@
               </div>
             </div>
 
-            <transition name="slide-fade">
+            <transition name="slide-fade" mode="out-in">
               <div v-if="showSyncSettings" class="sync-settings-panel">
                 <div class="settings-header">
                   <div class="header-left">
@@ -584,7 +585,9 @@ class NativeSynthesizer {
   }
 }
 
+const launchAudio = ref(null)
 const synth = new NativeSynthesizer()
+window.__stopHeartbeat = () => synth.stopHeartbeat()
 const audioManager = {
   playWelcomingIntro() {
     if (isGlobalMuted.value) return
@@ -633,6 +636,11 @@ const audioManager = {
   },
   playReflectionBGM() {
     if (isGlobalMuted.value) return
+    
+    // Set initial volume to 0 for fade-in effect
+    if (reflectionVideo.value) reflectionVideo.value.volume = 0
+    if (reflectionAudio.value) reflectionAudio.value.volume = 0
+    
     if (reflectionVideo.value) reflectionVideo.value.play().catch(() => {})
     if (narratorVisual.value) narratorVisual.value.play().catch(() => {})
     if (reflectionAudio.value) {
@@ -640,6 +648,19 @@ const audioManager = {
     } else {
       synth.startReflectionPad()
     }
+    
+    // Smoothly fade in volume over 2 seconds
+    let fadeVolume = 0
+    const fadeInterval = setInterval(() => {
+      if (fadeVolume < globalVolume.value) {
+        fadeVolume += 0.05
+        if (fadeVolume > globalVolume.value) fadeVolume = globalVolume.value
+        if (reflectionVideo.value) reflectionVideo.value.volume = fadeVolume
+        if (reflectionAudio.value) reflectionAudio.value.volume = fadeVolume
+      } else {
+        clearInterval(fadeInterval)
+      }
+    }, 100)
   },
   stopReflectionBGM() {
     if (reflectionVideo.value) reflectionVideo.value.pause()
@@ -655,12 +676,39 @@ const audioManager = {
     this.stopRiser()
     this.stopReflectionBGM()
     window.speechSynthesis.cancel()
+    if (launchAudio.value) {
+      launchAudio.value.pause()
+      launchAudio.value.currentTime = 0
+    }
   }
 }
 
 const store = useActivationStore()
+
+// Watch for real-time changes in the panel for standby sound
+watch(() => store.sessionSoundConsole.standby, (newVal) => {
+  audioManager.stopHeartbeat()
+  if (newVal !== 'mute' && !isGlobalMuted.value) {
+    audioManager.startHeartbeat()
+  }
+})
 const isLaunching = ref(false)
 const progressPercentage = ref(0)
+
+const logos = [
+  '/LogoRSAS JPG/Logo_RSAS_0.jpg',
+  '/LogoRSAS JPG/Logo_RSAS_1.jpg',
+  '/LogoRSAS JPG/Logo_RSAS_2.jpg',
+  '/LogoRSAS JPG/Logo_RSAS_3.jpg',
+  '/LogoRSAS JPG/Logo_RSAS_0_bw.jpg',
+  '/LogoRSAS JPG/Logo_RSAS_1_bw.jpg',
+  '/LogoRSAS JPG/Logo_RSAS_2_bw.jpg',
+  '/LogoRSAS JPG/Logo_RSAS_3_bw.jpg'
+]
+const activeLogoIndex = ref(0)
+const nextLogo = () => {
+  activeLogoIndex.value = (activeLogoIndex.value + 1) % logos.length
+}
 const activeStatusMessage = ref('')
 const errorMessage = ref('')
 const hasSigned = ref(false)
@@ -720,6 +768,16 @@ const reflectionTimestamps = ref([])
 onMounted(() => {
   const saved = JSON.parse(localStorage.getItem('rs100_reflection_ts'))
   reflectionTimestamps.value = (saved && saved.length === reflections.length) ? saved : [...defaultTimestamps]
+
+  // Try to start heartbeat on load
+  audioManager.startHeartbeat()
+
+  // Add click listener to bypass autoplay block
+  const enableAudio = () => {
+    audioManager.startHeartbeat()
+    document.removeEventListener('click', enableAudio)
+  }
+  document.addEventListener('click', enableAudio)
 })
 
 const saveTimestamps = () => {
@@ -808,10 +866,26 @@ const openBookPDF = () => {
 const statusMessages = ["Menerima denyut nadi VVIP...", "Menyalurkan energi EKG emas...", "Membentuk angka monumental 100...", "Memetakan siluet RSUD...", "Mengaktifkan Portal Digital..."]
 
 const startCinematicLaunch = () => {
+  if (isLaunching.value) return
   isLaunching.value = true
   progressPercentage.value = 0
-  audioManager.playLaunchWhoosh()
-  audioManager.playRiser(6.0)
+  
+  // Stop heartbeat sound when launch starts!
+  audioManager.stopHeartbeat()
+  
+  const s = store.sessionSoundConsole.loading
+  if (s === 'playback_6') {
+    if (launchAudio.value) {
+      launchAudio.value.pause()
+    }
+    launchAudio.value = new Audio('/playback_6.mp3')
+    launchAudio.value.volume = globalVolume.value
+    launchAudio.value.play().catch(e => console.error('Failed to play launch audio:', e))
+  } else if (s !== 'mute') {
+    audioManager.playLaunchWhoosh()
+    audioManager.playRiser(6.0)
+  }
+  
   let steps = 60
   let currentStep = 0
   const progressInterval = setInterval(() => {
@@ -1287,7 +1361,7 @@ onUnmounted(() => audioManager.stopAllActiveSounds())
 @keyframes draw-step { to { stroke-dashoffset: 0; } }
 
 .global-audio-toggle {
-  position: fixed; top: 2rem; right: 2rem;
+  position: fixed; top: 6.5rem; right: 2rem;
   background: rgba(11, 48, 29, 0.6); backdrop-filter: blur(10px);
   border: 1px solid rgba(247, 150, 51, 0.4); color: white;
   width: 56px; height: 56px; border-radius: 50%; cursor: pointer; z-index: 1000;

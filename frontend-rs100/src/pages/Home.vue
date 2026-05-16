@@ -10,7 +10,7 @@
           <h2 class="pre-title">1926 - 2026</h2>
           <h1 class="main-title font-historical">
             SATU ABAD <br />
-            <span class="text-green-gradient">RSUD ALOEI SABOE</span>
+            <span class="text-gold-gradient">RSUD ALOEI SABOE</span>
           </h1>
           <p class="tagline">
             "Satu Abad Melayani: Menjadi Lebih Baik untuk Semua"
@@ -138,7 +138,7 @@ const router = useRouter()
   .hero-bg-image {
     position: absolute;
     inset: 0;
-    background-image: url('/rsas.jpeg');
+    background-image: url('/hero-image.png');
     background-size: cover;
     background-position: center;
     transform: scale(1.05);
@@ -151,13 +151,13 @@ const router = useRouter()
     inset: 0;
     // Layer 1: Base Darkening
     background: linear-gradient(
-      135deg,
-      rgba(3, 20, 10, 0.92) 0%,
-      rgba(11, 48, 29, 0.6) 50%,
-      rgba(3, 20, 10, 0.8) 100%
+      to right,
+      rgba(3, 20, 10, 0.95) 0%,
+      rgba(11, 48, 29, 0.75) 50%,
+      rgba(3, 20, 10, 0.4) 100%
     );
     z-index: 1;
-    backdrop-filter: blur(1px);
+    backdrop-filter: blur(2px);
 
     // Layer 2: Animated Mesh Shimmer
     &::before {
@@ -265,6 +265,13 @@ const router = useRouter()
     filter: drop-shadow(0 2px 10px rgba(0, 255, 135, 0.25));
   }
 
+  .text-gold-gradient {
+    background: linear-gradient(135deg, #FFC385 0%, #F79633 50%, #C16400 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
   .tagline {
     font-size: 1.25rem;
     color: rgba(255, 255, 255, 0.9);
@@ -273,7 +280,7 @@ const router = useRouter()
     max-width: 600px;
     font-weight: 600;
     font-style: italic;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 2px 15px rgba(0, 0, 0, 0.6);
   }
 }
 
@@ -356,9 +363,10 @@ const router = useRouter()
 
   .gold-ring {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 95%;
+    height: 95%;
     border-radius: 50%;
+    aspect-ratio: 1 / 1;
     
     // Solid polished metallic gold borders
     border: 3.5px solid var(--color-gold, #F79633);
@@ -401,6 +409,7 @@ const router = useRouter()
     // Deep 3D curved glass shading (Refracted borders, light leaks, and shadows)
     box-shadow: 
       0 20px 45px rgba(0, 0, 0, 0.45),                               // Realistic 3D drop shadow
+      0 0 20px rgba(0, 255, 135, 0.4),                               // Neon glow
       inset 0 8px 18px rgba(255, 255, 255, 0.42),                    // Specular top glass bezel refraction
       inset 0 -8px 20px rgba(0, 0, 0, 0.55),                         // Ambient bottom shadow occlusion density
       inset 0 0 12px rgba(255, 255, 255, 0.25);                      // Inner refraction glass halo

@@ -8,11 +8,11 @@
     <div class="nav-links">
       <router-link to="/" class="nav-link" active-class="active">Beranda</router-link>
       <router-link to="/history" class="nav-link" active-class="active">Sejarah & E-Book</router-link>
-      <router-link to="/launching" class="nav-link" active-class="active">VVIP Launching</router-link>
+      <router-link to="/launching" class="nav-link" active-class="active">Peluncuran VVIP</router-link>
     </div>
     <div class="status-badge" :class="{ 'activated': store.isActivated }">
       <span class="status-dot"></span>
-      <span class="status-label">{{ store.isActivated ? 'Diresmikan' : 'Belum Aktif' }}</span>
+      <span class="status-label">Status: {{ store.isActivated ? 'Diresmikan' : 'Belum Aktif' }}</span>
     </div>
   </nav>
 </template>
@@ -131,6 +131,8 @@ const store = useActivationStore()
   letter-spacing: 1.2px;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 2px 8px rgba(239, 68, 68, 0.05);
+  white-space: nowrap;
+  flex-shrink: 0;
 
   .status-dot {
     width: 8px;

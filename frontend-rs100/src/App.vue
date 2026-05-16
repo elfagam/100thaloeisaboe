@@ -423,6 +423,7 @@ const sessionsList = [
     name: 'Sesi Riser',
     icon: '🚀',
     options: [
+      { id: 'playback_6', name: 'Playback 6 Detik (MP3)', icon: '🎵' },
       { id: 'futuristic', name: 'Futuristik (Siber Whoosh)', icon: '⚡' },
       { id: 'orchestral', name: 'Orkestra (Dengung Biola)', icon: '🎻' },
       { id: 'clinical', name: 'Medis (Detak Cepat)', icon: '🏥' },
