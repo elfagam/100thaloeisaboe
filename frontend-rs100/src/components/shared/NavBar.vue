@@ -7,7 +7,9 @@
     </div>
     <div class="nav-links">
       <router-link to="/" class="nav-link" active-class="active">Beranda</router-link>
-      <router-link to="/history" class="nav-link" active-class="active">Sejarah & E-Book</router-link>
+      <router-link to="/history" class="nav-link" active-class="active">Sejarah & Timeline</router-link>
+      <router-link to="/dashboard" class="nav-link" active-class="active">Dashboard</router-link>
+      <router-link to="/gallery" class="nav-link" active-class="active">Galeri</router-link>
       <router-link to="/launching" class="nav-link" active-class="active">Peluncuran VVIP</router-link>
     </div>
     <div class="status-badge" :class="{ 'activated': store.isActivated }">
