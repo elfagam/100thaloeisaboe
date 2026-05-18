@@ -40,6 +40,17 @@
             {{ isMuted ? '🔇 Buka Suara' : '🔊 Senyap' }}
           </button>
           
+          <!-- Interval Control -->
+          <div class="interval-control">
+            <label>⏱️ Jeda:</label>
+            <select v-model="slideDuration" class="control-select">
+              <option :value="3">3s</option>
+              <option :value="5">5s</option>
+              <option :value="10">10s</option>
+              <option :value="15">15s</option>
+            </select>
+          </div>
+          
           <button class="control-btn" @click="prevGalleryItem">◀️ Prev</button>
           <button class="control-btn" @click="nextGalleryItem">Next ▶️</button>
           
@@ -59,7 +70,8 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 const galleryItems = ref([])
 const currentIndex = ref(0)
 const isAutoPlaying = ref(false)
-const isMuted = ref(false)
+const isMuted = ref(true)
+const slideDuration = ref(5)
 const countdown = ref(0)
 const progressPercentage = ref(0)
 let timer = null
@@ -105,7 +117,7 @@ const toggleMute = () => {
   if (isMuted.value) {
     window.speechSynthesis.cancel()
     if (isAutoPlaying.value) {
-      startCountdown(5) // Start countdown immediately if muted
+      startCountdown(slideDuration.value) // Start countdown immediately if muted
     }
   } else if (isAutoPlaying.value) {
     speakNarration()
@@ -119,7 +131,7 @@ const speakNarration = (startAuto = false) => {
   
   const text = currentGalleryItem.value ? currentGalleryItem.value.narration : ''
   if (!text || isMuted.value) {
-    startCountdown(5) // Just wait 5 seconds if muted or no text
+    startCountdown(slideDuration.value) // Just wait if muted or no text
     return
   }
 
@@ -138,14 +150,14 @@ const speakNarration = (startAuto = false) => {
 
   utterance.onend = () => {
     if (isAutoPlaying.value) {
-      startCountdown(5) // 5 seconds pause after narration
+      startCountdown(slideDuration.value) // Pause after narration
     }
   }
 
   utterance.onerror = (e) => {
     console.error('SpeechSynthesis error:', e)
     if (isAutoPlaying.value) {
-      startCountdown(5)
+      startCountdown(slideDuration.value)
     }
   }
 
@@ -364,10 +376,38 @@ onUnmounted(() => {
 
   &.exit-btn {
     background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     color: #FFFFFF;
     &:hover {
       background: rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+.interval-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #FFC385;
+  font-weight: 700;
+  
+  .control-select {
+    background: rgba(247, 150, 51, 0.1);
+    border: 1px solid rgba(247, 150, 51, 0.3);
+    color: #FFC385;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    outline: none;
+    
+    option {
+      background: #03140A;
+      color: #FFC385;
+    }
+    
+    &:focus {
+      border-color: #F79633;
     }
   }
 }

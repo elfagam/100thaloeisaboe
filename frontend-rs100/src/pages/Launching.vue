@@ -84,14 +84,14 @@
               </div>
 
               <div class="components-grid">
-                <div class="component-item">
+                <div class="component-item" :class="{ 'glow-active': activeCards[0] }">
                   <div class="comp-icon">🏛️</div>
                   <div class="comp-info">
                     <h3>MUSEUM</h3>
                     <p>Prof.dr. H. Aloei Saboe</p>
                   </div>
                 </div>
-                <div class="component-item active-comp" @click="openBookPDF" style="cursor: pointer;">
+                <div class="component-item active-comp" :class="{ 'glow-active': activeCards[1] }" @click="openBookPDF" style="cursor: pointer;">
                   <div class="comp-icon">
                     <img src="/cover-buku.png" alt="Cover Buku 100 Tahun" class="comp-book-img" />
                   </div>
@@ -100,7 +100,7 @@
                     <p>100 Tahun RSAS</p>
                   </div>
                 </div>
-                <div class="component-item active-comp" @click="nextLogo" style="cursor: pointer;">
+                <div class="component-item active-comp" :class="{ 'glow-active': activeCards[2] }" @click="nextLogo" style="cursor: pointer;">
                   <div class="comp-icon">
                     <img :src="logos[activeLogoIndex]" alt="Logo RSAS 100 Tahun" class="comp-logo-img" />
                   </div>
@@ -109,14 +109,14 @@
                     <p>Branding Satu Abad</p>
                   </div>
                 </div>
-                <div class="component-item">
+                <div class="component-item" :class="{ 'glow-active': activeCards[3] }">
                   <div class="comp-icon">🏥</div>
                   <div class="comp-info">
                     <h3>GEDUNG</h3>
                     <p>Nama Tokoh RS</p>
                   </div>
                 </div>
-                <div class="component-item">
+                <div class="component-item" :class="{ 'glow-active': activeCards[4] }">
                   <div class="comp-icon">💊</div>
                   <div class="comp-info">
                     <h3>INOVASI</h3>
@@ -133,6 +133,8 @@
                   <span class="activation-text">SENTUH LAYAR UNTUK MERESMIKAN</span>
                 </div>
               </div>
+
+              <!-- Activation Lines Removed (Replaced by Confetti) -->
             </div>
           </div>
         </transition>
@@ -694,6 +696,8 @@ watch(() => store.sessionSoundConsole.standby, (newVal) => {
 })
 const isLaunching = ref(false)
 const progressPercentage = ref(0)
+const isActivating = ref(false)
+const activeCards = ref([false, false, false, false, false])
 
 const logos = [
   '/LogoRSAS JPG/Logo_RSAS_0.jpg',
@@ -837,8 +841,6 @@ const startReflectionAutoPlay = () => {
       }
       if (targetIndex !== currentReflectionIndex.value) currentReflectionIndex.value = targetIndex
     }
-  } else {
-    speakNarration(reflections[currentReflectionIndex.value])
   }
 }
 
@@ -905,13 +907,56 @@ const finalizeActivation = async () => {
   else { isLaunching.value = false; errorMessage.value = result.error }
 }
 
-const finalizeSignature = () => {
-  hasSigned.value = true
+const loadConfetti = () => {
+  return new Promise((resolve) => {
+    if (window.confetti) {
+      resolve(window.confetti)
+      return
+    }
+    const script = document.createElement('script')
+    script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"
+    script.onload = () => resolve(window.confetti)
+    document.head.appendChild(script)
+  })
+}
+
+const finalizeSignature = async () => {
+  if (isActivating.value) return
+  isActivating.value = true
+  
+  // Pastikan suara detak jantung berhenti saat aktivasi dimulai
+  audioManager.stopHeartbeat()
+  
   audioManager.playSignatureSuccess()
+  
+  // Load and trigger confetti
+  const confetti = await loadConfetti()
+  
+  // Explosion from bottom center
+  confetti({
+    particleCount: 150,
+    spread: 80,
+    origin: { y: 0.8, x: 0.5 },
+    colors: ['#FFD700', '#FFA500', '#00FF87', '#FFFFFF'],
+    gravity: 1.0,
+    scalar: 1.2,
+    ticks: 200
+  })
+  
+  // Flash effect on cards: all light up after 200ms
   setTimeout(() => {
-    audioManager.playReflectionBGM()
-    startReflectionAutoPlay()
-  }, 1200)
+    activeCards.value = [true, true, true, true, true]
+  }, 200)
+  
+  // Proceed to Phase 3 after 2.5 seconds (let the particles fall)
+  setTimeout(() => {
+    hasSigned.value = true
+    // Berikan jeda sedikit agar DOM merender elemen video di Fase 3
+    setTimeout(() => {
+      audioManager.playReflectionBGM()
+      startReflectionAutoPlay()
+    }, 200)
+  }, 2500)
 }
 
 const resetEverything = () => {
@@ -919,6 +964,8 @@ const resetEverything = () => {
   store.resetActivation()
   isLaunching.value = false
   hasSigned.value = false
+  isActivating.value = false
+  activeCards.value = [false, false, false, false, false]
   stopAndResetReflection()
 }
 
@@ -1144,7 +1191,47 @@ onUnmounted(() => audioManager.stopAllActiveSounds())
         inset 0 0 20px rgba(0, 255, 135, 0.1);
       h3 { color: #00FF87; text-shadow: 0 0 10px rgba(0, 255, 135, 0.5); }
     }
+
+    &.glow-active {
+      border-color: #00FF87 !important;
+      background: rgba(0, 255, 135, 0.2) !important;
+      box-shadow: 
+        0 0 50px rgba(0, 255, 135, 0.6),
+        inset 0 0 30px rgba(0, 255, 135, 0.3) !important;
+      transform: translateY(-15px) scale(1.05) !important;
+      
+      h3 {
+        color: #00FF87 !important;
+        text-shadow: 0 0 15px rgba(0, 255, 135, 0.8) !important;
+      }
+    }
   }
+}
+
+.activation-lines {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.line {
+  stroke: #00FF87;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 1200;
+  stroke-dashoffset: 1200;
+  filter: drop-shadow(0 0 10px #00FF87);
+}
+
+.line-1 { animation: draw-line 0.3s forwards 0s; }
+.line-2 { animation: draw-line 0.3s forwards 0.15s; }
+.line-3 { animation: draw-line 0.3s forwards 0.3s; }
+.line-4 { animation: draw-line 0.3s forwards 0.45s; }
+.line-5 { animation: draw-line 0.3s forwards 0.6s; }
+
+@keyframes draw-line {
+  to { stroke-dashoffset: 0; }
 }
 
 .activation-trigger {
