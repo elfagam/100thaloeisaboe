@@ -4,12 +4,19 @@ import Launching from '../pages/Launching.vue'
 import History from '../pages/History.vue'
 import Dashboard from '../pages/Dashboard.vue'
 import Gallery from '../pages/Gallery.vue'
+import Reflection from '../pages/Reflection.vue'
+import Preshow from '../pages/Preshow.vue'
 
 const routes = [
   {
     path: '/',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/preshow',
+    name: 'Preshow',
+    component: Preshow
   },
   {
     path: '/launching',
@@ -30,6 +37,11 @@ const routes = [
     path: '/gallery',
     name: 'Gallery',
     component: Gallery
+  },
+  {
+    path: '/reflection',
+    name: 'Reflection',
+    component: Reflection
   },
   {
     path: '/:pathMatch(.*)*',

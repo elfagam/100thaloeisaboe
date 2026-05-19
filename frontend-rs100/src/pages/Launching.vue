@@ -58,6 +58,8 @@
               <path class="path-element path-zero-one" d="M 335,190 C 335,120 385,120 385,190 C 385,260 335,260 335,190 Z" filter="url(#gold-glow)" />
               <path class="path-element path-zero-two" d="M 410,190 C 410,120 460,120 460,190 C 460,260 410,260 410,190 Z" filter="url(#gold-glow)" />
               <path class="path-element path-building" d="M 485,200 L 515,200 L 515,160 L 545,160 L 545,110 L 580,110 L 580,70 L 615,70 L 615,110 L 650,110 L 650,160 L 680,160 L 680,200 L 750,200" filter="url(#green-glow)" />
+              <!-- Logo Rumah Sakit di Puncak Gedung -->
+              <image href="/Logo_RSAS_v03.svg" x="582" y="25" width="35" height="35" class="small-hospital-logo" />
               <path class="path-element path-cross" d="M 590,90 L 606,90 M 598,82 L 598,98" filter="url(#green-glow)" />
             </svg>
             <div class="cinematic-footer">
@@ -134,79 +136,41 @@
                 </div>
               </div>
 
+              <div class="showcase-timer-settings">
+                <label>⏱️ Waktu Tampil Card:</label>
+                <input type="number" v-model.number="showcaseDuration" min="1" max="20" step="1" />
+                <span>detik</span>
+              </div>
+
               <!-- Activation Lines Removed (Replaced by Confetti) -->
-            </div>
-          </div>
-        </transition>
 
-        <!-- 📖 Centennial Reflection Narrative (Fase 3) -->
-        <transition name="slide-fade" mode="out-in">
-          <div v-if="hasSigned" class="reflection-panel-card animate-fade">
-            <video ref="reflectionVideo" class="reflection-video-bg" src="/Video-Narasi.mp4" playsinline loop muted></video>
-            <video ref="reflectionAudio" src="/Video-Narasi.mp4" playsinline style="display: none;" @ended="onReflectionAudioEnded"></video>
-
-            <div 
-              ref="narratorPortal" 
-              class="narrator-portal" 
-              :class="{ expanded: isNarratorExpanded, dragging: isDragging }"
-              :style="narratorStyle"
-              @mousedown="startDrag" @touchstart="startDrag" @click="toggleNarratorSize"
-            >
-              <video ref="narratorVisual" class="narrator-video-window" src="/Video-Narasi.mp4" playsinline muted></video>
-              <div class="narrator-overlay">
-                <span class="narrator-label">NARATOR</span>
-                <span class="drag-handle">⠿</span>
-              </div>
-            </div>
-
-            <div class="reflection-header">
-              <span class="reflection-tag font-historical text-gold-gradient">📖 PENJELASAN SATU ABAD (AUTO-PLAY)</span>
-              <div class="reflection-controls">
-                <button @click="prevReflection" class="control-arrow-btn" :disabled="currentReflectionIndex === 0">◀</button>
-                <span class="control-count">{{ currentReflectionIndex + 1 }} / {{ reflections.length }}</span>
-                <button @click="nextReflection" class="control-arrow-btn" :disabled="currentReflectionIndex === reflections.length - 1">▶</button>
-                <button @click="toggleReflectionAutoPlay" class="control-play-btn" :class="{ active: isReflectionPlaying }">
-                  <span v-if="isReflectionPlaying">⏸ Jeda</span>
-                  <span v-else>▶ Putar</span>
-                </button>
-                <button @click="stopAndResetReflection" class="control-stop-btn">⏹ Berhenti</button>
-                
-                <!-- 🔊 Volume Control -->
-                <div class="volume-control">
-                  <span class="volume-icon">{{ globalVolume > 0.5 ? '🔊' : globalVolume > 0 ? '🔉' : '🔇' }}</span>
-                  <input type="range" v-model.number="globalVolume" min="0" max="1" step="0.05" class="volume-slider" @input="updateVolume" />
-                </div>
-
-                <button @click="showSyncSettings = !showSyncSettings" class="control-settings-btn" :class="{ active: showSyncSettings }">⚙️</button>
-              </div>
-            </div>
-
-            <transition name="slide-fade" mode="out-in">
-              <div v-if="showSyncSettings" class="sync-settings-panel">
-                <div class="settings-header">
-                  <div class="header-left">
-                    <h5>⏱️ PENGATURAN WAKTU SLIDE</h5>
-                    <div class="live-timer" :class="{ pulsing: isReflectionPlaying }">
-                      <span class="timer-label">WAKTU SEKARANG:</span>
-                      <span class="timer-value">{{ formatTime(reflectionPlaybackTime) }}</span>
+              <!-- Showcase Overlay -->
+              <transition name="fade">
+                <div v-if="showcaseActive" class="showcase-overlay">
+                  <div class="showcase-card">
+                    <div class="showcase-header">
+                      <div class="showcase-icon" v-if="showcaseCards[currentShowcaseIndex].icon">
+                        {{ showcaseCards[currentShowcaseIndex].icon }}
+                      </div>
+                      <div class="showcase-image" v-else-if="showcaseCards[currentShowcaseIndex].image || showcaseCards[currentShowcaseIndex].title === 'LOGO'">
+                        <img :src="showcaseCards[currentShowcaseIndex].title === 'LOGO' ? logos[activeLogoIndex] : showcaseCards[currentShowcaseIndex].image" alt="Showcase Image" class="showcase-img" />
+                      </div>
+                      <div class="showcase-title-area">
+                        <h2>{{ showcaseCards[currentShowcaseIndex].title }}</h2>
+                        <h3>{{ showcaseCards[currentShowcaseIndex].subtitle }}</h3>
+                      </div>
+                    </div>
+                    <div class="showcase-body">
+                      <p>{{ showcaseCards[currentShowcaseIndex].narration }}</p>
                     </div>
                   </div>
-                  <button @click="resetTimestamps" class="mini-reset-btn">Reset Default</button>
                 </div>
-                <div class="settings-grid">
-                  <div v-for="(ts, index) in reflectionTimestamps" :key="index" class="settings-item">
-                    <label>Slide {{ index + 1 }}</label>
-                    <input type="number" v-model.number="reflectionTimestamps[index]" @change="saveTimestamps" step="0.5" min="0" :class="{ error: index > 0 && reflectionTimestamps[index] <= reflectionTimestamps[index-1] }" />
-                  </div>
-                </div>
-              </div>
-            </transition>
-
-            <div class="reflection-body">
-              <p class="reflection-text">{{ reflections[currentReflectionIndex] }}</p>
+              </transition>
             </div>
           </div>
         </transition>
+
+        <!-- Fase 3 dipindahkan ke halaman terpisah (/reflection) -->
 
         <div class="plaque-footer">
           <span class="badge">EST. 1926</span>
@@ -588,6 +552,7 @@ class NativeSynthesizer {
 }
 
 const launchAudio = ref(null)
+const showcaseAudio = ref(null)
 const synth = new NativeSynthesizer()
 window.__stopHeartbeat = () => synth.stopHeartbeat()
 const audioManager = {
@@ -629,6 +594,35 @@ const audioManager = {
     const s = store.sessionSoundConsole.signature
     if (s === 'mute') return
     synth.playSignatureSuccess(s)
+  },
+  playTransition() {
+    if (isGlobalMuted.value) return
+    const audio = new Audio('/transisi.mp3')
+    audio.volume = globalVolume.value
+    audio.play().catch(e => console.error('Failed to play transition audio:', e))
+  },
+  playShowcaseBGM() {
+    if (isGlobalMuted.value) return
+    showcaseAudio.value = new Audio('/launching.mp3')
+    showcaseAudio.value.volume = globalVolume.value
+    showcaseAudio.value.play().catch(e => console.error('Failed to play showcase BGM:', e))
+  },
+  stopShowcaseBGM() {
+    if (showcaseAudio.value) {
+      const audio = showcaseAudio.value
+      let volume = audio.volume
+      const fadeInterval = setInterval(() => {
+        if (volume > 0.05) {
+          volume -= 0.05
+          audio.volume = volume
+        } else {
+          clearInterval(fadeInterval)
+          audio.pause()
+          audio.currentTime = 0
+          audio.volume = globalVolume.value // Reset volume untuk pemutaran berikutnya
+        }
+      }, 100)
+    }
   },
   playClosing() {
     if (isGlobalMuted.value) return
@@ -699,15 +693,24 @@ const progressPercentage = ref(0)
 const isActivating = ref(false)
 const activeCards = ref([false, false, false, false, false])
 
+const showcaseActive = ref(false)
+const currentShowcaseIndex = ref(0)
+const showcaseDuration = ref(5) // Durasi tampil tiap card dalam detik (dikembalikan ke default)
+
+const showcaseCards = [
+  { title: 'MUSEUM', subtitle: 'Prof.dr. H. Aloei Saboe', icon: '🏛️', image: null, narration: 'Pembangunan Museum Prof.dr. H. Aloei Saboe sebagai pusat dokumentasi sejarah dan perjalanan rumah sakit dari masa ke masa.' },
+  { title: 'BUKU', subtitle: '100 Tahun RSAS', icon: null, image: '/cover-buku.png', narration: 'Peluncuran Buku Sejarah 100 Tahun RSAS yang merangkum dedikasi, perjuangan, dan inovasi dalam melayani masyarakat.' },
+  { title: 'LOGO', subtitle: 'Branding Satu Abad', icon: null, image: null, narration: 'Peluncuran Logo Baru Satu Abad yang mencerminkan semangat transformasi, profesionalisme, dan pelayanan yang tulus.' },
+  { title: 'GEDUNG', subtitle: 'Nama Tokoh RS', icon: '🏥', image: null, narration: 'Peresmian nama-nama gedung baru menggunakan nama tokoh-tokoh yang berjasa dalam sejarah perkembangan rumah sakit.' },
+  { title: 'INOVASI', subtitle: 'Safety Stock Obat', icon: '💊', image: null, narration: 'Peluncuran sistem inovasi Safety Stock Obat untuk menjamin ketersediaan obat secara real-time dan aman bagi pasien.' }
+]
+
 const logos = [
-  '/LogoRSAS JPG/Logo_RSAS_0.jpg',
-  '/LogoRSAS JPG/Logo_RSAS_1.jpg',
-  '/LogoRSAS JPG/Logo_RSAS_2.jpg',
-  '/LogoRSAS JPG/Logo_RSAS_3.jpg',
-  '/LogoRSAS JPG/Logo_RSAS_0_bw.jpg',
-  '/LogoRSAS JPG/Logo_RSAS_1_bw.jpg',
-  '/LogoRSAS JPG/Logo_RSAS_2_bw.jpg',
-  '/LogoRSAS JPG/Logo_RSAS_3_bw.jpg'
+  '/logo-svg/Logo_RSAS_v01.svg',
+  '/logo-svg/Logo_RSAS_v02.svg',
+  '/logo-svg/Logo_RSAS_v03.svg',
+  '/logo-svg/Logo_RSAS_v01_bw.svg',
+  '/logo-svg/Logo_RSAS_v02_bw.svg'
 ]
 const activeLogoIndex = ref(0)
 const nextLogo = () => {
@@ -880,15 +883,15 @@ const startCinematicLaunch = () => {
     if (launchAudio.value) {
       launchAudio.value.pause()
     }
-    launchAudio.value = new Audio('/playback_6.mp3')
+    launchAudio.value = new Audio('/transisi.mp3')
     launchAudio.value.volume = globalVolume.value
     launchAudio.value.play().catch(e => console.error('Failed to play launch audio:', e))
   } else if (s !== 'mute') {
     audioManager.playLaunchWhoosh()
-    audioManager.playRiser(6.0)
+    audioManager.playRiser(0.29)
   }
   
-  let steps = 60
+  let steps = 290
   let currentStep = 0
   const progressInterval = setInterval(() => {
     currentStep++
@@ -920,6 +923,33 @@ const loadConfetti = () => {
   })
 }
 
+const startShowcase = () => {
+  showcaseActive.value = true
+  currentShowcaseIndex.value = 0
+  
+  // Putar musik latar showcase
+  audioManager.playShowcaseBGM()
+  
+  const playCard = (index) => {
+    if (index >= showcaseCards.length) {
+      // End of showcase, stay on the dashboard with all cards active
+      showcaseActive.value = false
+      activeCards.value = [true, true, true, true, true]
+      audioManager.stopShowcaseBGM()
+      return
+    }
+    
+    currentShowcaseIndex.value = index
+    // Play transition sound effect! (Dihilangkan karena tumpang tindih)
+    
+    setTimeout(() => {
+      playCard(index + 1)
+    }, showcaseDuration.value * 1000)
+  }
+  
+  playCard(0)
+}
+
 const finalizeSignature = async () => {
   if (isActivating.value) return
   isActivating.value = true
@@ -948,14 +978,9 @@ const finalizeSignature = async () => {
     activeCards.value = [true, true, true, true, true]
   }, 200)
   
-  // Proceed to Phase 3 after 2.5 seconds (let the particles fall)
+  // Start showcase after 2.5 seconds (let the particles fall)
   setTimeout(() => {
-    hasSigned.value = true
-    // Berikan jeda sedikit agar DOM merender elemen video di Fase 3
-    setTimeout(() => {
-      audioManager.playReflectionBGM()
-      startReflectionAutoPlay()
-    }, 200)
+    startShowcase()
   }, 2500)
 }
 
@@ -1051,11 +1076,42 @@ onUnmounted(() => audioManager.stopAllActiveSounds())
   .ecg-svg { width: 100%; height: auto; }
   .path-element {
     fill: none; stroke-linecap: round; stroke-linejoin: round;
-    stroke-dasharray: 1000; stroke-dashoffset: 1000; stroke-width: 6;
+    stroke-dasharray: 1000; stroke-dashoffset: 1000; stroke-width: 10;
+  }
+  
+  .status-msg {
+    font-size: 1.5rem;
+    color: #00FF87;
+    text-align: center;
+    margin-top: 1.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(0, 255, 135, 0.5);
+  }
+  
+  .path-ecg {
+    stroke: #00FF87;
     animation: draw-step 5s forwards ease-in-out;
   }
-  .path-ecg, .path-building { stroke: #00FF87; }
-  .path-one, .path-zero-one, .path-zero-two { stroke: #F79633; }
+  
+  .path-one, .path-zero-one, .path-zero-two {
+    stroke: #F79633;
+    animation: draw-step 8s forwards ease-in-out;
+    animation-delay: 4s;
+  }
+  
+  .path-building {
+    stroke: #00FF87;
+    animation: draw-step 19s forwards ease-in-out;
+    animation-delay: 10s;
+  }
+  
+  .small-hospital-logo {
+    opacity: 0;
+    animation: fade-in-logo 2s forwards ease-in-out;
+    animation-delay: 15s;
+  }
 }
 
 .launch-dashboard-panel {
@@ -1447,6 +1503,10 @@ onUnmounted(() => audioManager.stopAllActiveSounds())
 
 @keyframes draw-step { to { stroke-dashoffset: 0; } }
 
+@keyframes fade-in-logo {
+  to { opacity: 1; }
+}
+
 .global-audio-toggle {
   position: fixed; top: 6.5rem; right: 2rem;
   background: rgba(11, 48, 29, 0.6); backdrop-filter: blur(10px);
@@ -1454,5 +1514,119 @@ onUnmounted(() => audioManager.stopAllActiveSounds())
   width: 56px; height: 56px; border-radius: 50%; cursor: pointer; z-index: 1000;
   transition: all 0.3s ease;
   &:hover { transform: scale(1.1); background: rgba(247, 150, 51, 0.2); }
+}
+
+.showcase-timer-settings {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 5rem; /* Menghindari tumpang tindih dengan teks tombol yang posisinya absolute */
+  background: rgba(0, 0, 0, 0.4);
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(247, 150, 51, 0.3);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  
+  label {
+    font-size: 0.8rem;
+    color: #94A3B8;
+    font-weight: 700;
+  }
+  
+  input {
+    background: #111;
+    border: 1px solid #F79633;
+    color: #00FF87;
+    padding: 4px 8px;
+    border-radius: 6px;
+    width: 60px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 0.9rem;
+  }
+  
+  span {
+    font-size: 0.8rem;
+    color: #94A3B8;
+  }
+}
+
+/* Showcase Overlay Styles */
+.showcase-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  border-radius: 24px;
+}
+
+.showcase-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 2.5rem;
+  width: 80%;
+  max-width: 600px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  animation: scale-up 0.3s ease-out;
+}
+
+.showcase-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 1.5rem;
+}
+
+.showcase-icon {
+  font-size: 4rem;
+}
+
+.showcase-image {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.showcase-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.showcase-title-area h2 {
+  font-size: 2rem;
+  color: #00FF87;
+  margin: 0;
+}
+
+.showcase-title-area h3 {
+  font-size: 1.2rem;
+  color: #F79633;
+  margin: 0.5rem 0 0 0;
+}
+
+.showcase-body p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #E2E8F0;
+  margin: 0;
+}
+
+@keyframes scale-up {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 </style>
