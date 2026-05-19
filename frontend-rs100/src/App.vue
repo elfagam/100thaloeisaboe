@@ -3,7 +3,7 @@
     <!-- High-Performance hardware-accelerated brightness overlays (0% CPU/GPU overhead) -->
     <div class="global-brightness-overlay" :class="activationStore.brightnessModifier"></div>
 
-    <NavBar v-if="$route.path !== '/preshow'" />
+    <NavBar v-if="$route.path !== '/remote'" />
     <main class="main-content">
       <router-view v-slot="{ Component }">
         <transition name="fade" mode="out-in">

@@ -54,6 +54,10 @@ func (h *HttpHandler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/milestones", h.handleMilestones)
 	mux.HandleFunc("/api/milestones/", h.handleMilestoneDetail)
 	
+	// Remote routes
+	mux.HandleFunc("/api/remote/trigger", h.handleRemoteTrigger)
+	mux.HandleFunc("/api/remote/status", h.handleRemoteStatus)
+	
 	mux.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("uploads"))))
 }
 
@@ -79,6 +83,23 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 
 func respondWithError(w http.ResponseWriter, code int, message string) {
 	respondWithJSON(w, code, map[string]string{"error": message})
+}
+
+var lastRemoteTrigger int64
+
+func (h *HttpHandler) handleRemoteTrigger(w http.ResponseWriter, r *http.Request) {
+	if enableCORS(w, r) {
+		return
+	}
+	lastRemoteTrigger = time.Now().UnixNano() / int64(time.Millisecond)
+	respondWithJSON(w, http.StatusOK, map[string]interface{}{"status": "triggered", "timestamp": lastRemoteTrigger})
+}
+
+func (h *HttpHandler) handleRemoteStatus(w http.ResponseWriter, r *http.Request) {
+	if enableCORS(w, r) {
+		return
+	}
+	respondWithJSON(w, http.StatusOK, map[string]interface{}{"lastTrigger": lastRemoteTrigger})
 }
 
 func (h *HttpHandler) handleBooks(w http.ResponseWriter, r *http.Request) {

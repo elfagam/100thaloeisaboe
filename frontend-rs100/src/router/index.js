@@ -6,12 +6,18 @@ import Dashboard from '../pages/Dashboard.vue'
 import Gallery from '../pages/Gallery.vue'
 import Reflection from '../pages/Reflection.vue'
 import Preshow from '../pages/Preshow.vue'
+import Remote from '../pages/Remote.vue'
 
 const routes = [
   {
     path: '/',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/remote',
+    name: 'Remote',
+    component: Remote
   },
   {
     path: '/preshow',

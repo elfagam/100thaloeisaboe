@@ -7,7 +7,9 @@
         <div v-if="!isLaunching" class="instructions animate-fade">
           <h3 class="gold-subtitle">SISTEM SIAP DILUNCURKAN</h3>
           <p>Yth. Bapak Wali Kota Gorontalo,</p>
-          <p class="touch-call">Silakan sentuh ikon jantung di bawah untuk memulai peresmian</p>
+          <br>
+          <br>
+          <p class="touch-call">Kami Akan Memulai Proses Peresmian  </p>
           
           <div v-if="errorMessage" class="error-msg" style="max-width: 500px; margin: 2rem auto 0;">
             ⚠️ {{ errorMessage }}
@@ -131,8 +133,8 @@
                 <div class="activation-trigger" @click="finalizeSignature">
                   <div class="pulse-ring"></div>
                   <div class="pulse-ring-outer"></div>
-                  <div class="activation-icon">🖐️</div>
-                  <span class="activation-text">SENTUH LAYAR UNTUK MERESMIKAN</span>
+                  <div class="activation-icon">🔒</div>
+                  <span class="activation-text animate-pulse" style="letter-spacing: 2px;">MENUNGGU OTORISASI VVIP...</span>
                 </div>
               </div>
 
@@ -144,28 +146,7 @@
 
               <!-- Activation Lines Removed (Replaced by Confetti) -->
 
-              <!-- Showcase Overlay -->
-              <transition name="fade">
-                <div v-if="showcaseActive" class="showcase-overlay">
-                  <div class="showcase-card">
-                    <div class="showcase-header">
-                      <div class="showcase-icon" v-if="showcaseCards[currentShowcaseIndex].icon">
-                        {{ showcaseCards[currentShowcaseIndex].icon }}
-                      </div>
-                      <div class="showcase-image" v-else-if="showcaseCards[currentShowcaseIndex].image || showcaseCards[currentShowcaseIndex].title === 'LOGO'">
-                        <img :src="showcaseCards[currentShowcaseIndex].title === 'LOGO' ? logos[activeLogoIndex] : showcaseCards[currentShowcaseIndex].image" alt="Showcase Image" class="showcase-img" />
-                      </div>
-                      <div class="showcase-title-area">
-                        <h2>{{ showcaseCards[currentShowcaseIndex].title }}</h2>
-                        <h3>{{ showcaseCards[currentShowcaseIndex].subtitle }}</h3>
-                      </div>
-                    </div>
-                    <div class="showcase-body">
-                      <p>{{ showcaseCards[currentShowcaseIndex].narration }}</p>
-                    </div>
-                  </div>
-                </div>
-              </transition>
+              <!-- Showcase Overlay Dipindahkan Ke Bawah Agar Tidak Terpotong -->
             </div>
           </div>
         </transition>
@@ -178,6 +159,47 @@
         </div>
       </div>
     </div>
+
+    <!-- Showcase Overlay (Dipindahkan keluar agar Fullscreen Sinematik Tanpa Terpotong) -->
+    <transition name="fade">
+      <div v-if="showcaseActive" class="showcase-overlay">
+        <transition name="showcase-card-transition" mode="out-in">
+          <div :key="currentShowcaseIndex" class="showcase-card">
+            <!-- KIRI: Media Player Sinematik (Video / Gambar Besar / Ikon) -->
+            <div class="showcase-media-content">
+              <div class="showcase-video-wrapper" v-if="showcaseCards[currentShowcaseIndex].video">
+                <video 
+                  :src="showcaseCards[currentShowcaseIndex].video" 
+                  autoplay 
+                  muted 
+                  playsinline 
+                  @ended="handleVideoEnded" 
+                  class="showcase-video-player"
+                ></video>
+              </div>
+              <div class="showcase-image-wrapper" v-else-if="showcaseCards[currentShowcaseIndex].image || showcaseCards[currentShowcaseIndex].title === 'LOGO'">
+                <img :src="showcaseCards[currentShowcaseIndex].title === 'LOGO' ? logos[activeLogoIndex] : showcaseCards[currentShowcaseIndex].image" alt="Showcase Image" class="showcase-large-img" />
+              </div>
+              <div class="showcase-icon-wrapper" v-else-if="showcaseCards[currentShowcaseIndex].icon">
+                <span class="showcase-large-icon">{{ showcaseCards[currentShowcaseIndex].icon }}</span>
+              </div>
+            </div>
+            
+            <!-- KANAN: Detail Informasi Teks Skala Besar untuk Videotron -->
+            <div class="showcase-info-content">
+              <div class="showcase-header-details">
+                <h2 class="showcase-main-title">{{ showcaseCards[currentShowcaseIndex].title }}</h2>
+                <h3 class="showcase-sub-title">{{ showcaseCards[currentShowcaseIndex].subtitle }}</h3>
+              </div>
+              <div class="showcase-divider"></div>
+              <div class="showcase-body">
+                <p class="showcase-narration-text">{{ showcaseCards[currentShowcaseIndex].narration }}</p>
+              </div>
+            </div>
+          </div>
+        </transition>
+      </div>
+    </transition>
 
     <!-- Global Mute Toggle Button -->
     <button @click="toggleGlobalMute" class="global-audio-toggle" :title="isGlobalMuted ? 'Buka Suara' : 'Senyap'">
@@ -698,11 +720,11 @@ const currentShowcaseIndex = ref(0)
 const showcaseDuration = ref(5) // Durasi tampil tiap card dalam detik (dikembalikan ke default)
 
 const showcaseCards = [
-  { title: 'MUSEUM', subtitle: 'Prof.dr. H. Aloei Saboe', icon: '🏛️', image: null, narration: 'Pembangunan Museum Prof.dr. H. Aloei Saboe sebagai pusat dokumentasi sejarah dan perjalanan rumah sakit dari masa ke masa.' },
-  { title: 'BUKU', subtitle: '100 Tahun RSAS', icon: null, image: '/cover-buku.png', narration: 'Peluncuran Buku Sejarah 100 Tahun RSAS yang merangkum dedikasi, perjuangan, dan inovasi dalam melayani masyarakat.' },
-  { title: 'LOGO', subtitle: 'Branding Satu Abad', icon: null, image: null, narration: 'Peluncuran Logo Baru Satu Abad yang mencerminkan semangat transformasi, profesionalisme, dan pelayanan yang tulus.' },
-  { title: 'GEDUNG', subtitle: 'Nama Tokoh RS', icon: '🏥', image: null, narration: 'Peresmian nama-nama gedung baru menggunakan nama tokoh-tokoh yang berjasa dalam sejarah perkembangan rumah sakit.' },
-  { title: 'INOVASI', subtitle: 'Safety Stock Obat', icon: '💊', image: null, narration: 'Peluncuran sistem inovasi Safety Stock Obat untuk menjamin ketersediaan obat secara real-time dan aman bagi pasien.' }
+  { title: 'MUSEUM', subtitle: 'Prof.dr. H. Aloei Saboe', icon: null, image: null, video: '/card/museum.mp4', narration: 'Pembangunan Museum Prof.dr. H. Aloei Saboe sebagai pusat dokumentasi sejarah dan perjalanan rumah sakit dari masa ke masa.' },
+  { title: 'BUKU', subtitle: '100 Tahun RSAS', icon: null, image: null, video: '/card/buku.mp4', narration: 'Peluncuran Buku Sejarah 100 Tahun RSAS yang merangkum dedikasi, perjuangan, dan inovasi dalam melayani masyarakat.' },
+  { title: 'LOGO', subtitle: 'Branding Satu Abad', icon: null, image: null, video: '/card/logo.mp4', narration: 'Peluncuran Logo Baru Satu Abad yang mencerminkan semangat transformasi, profesionalisme, dan pelayanan yang tulus.' },
+  { title: 'GEDUNG', subtitle: 'Nama Tokoh RS', icon: null, image: null, video: '/card/gedung.mp4', narration: 'Peresmian nama-nama gedung baru menggunakan nama tokoh-tokoh yang berjasa dalam sejarah perkembangan rumah sakit.' },
+  { title: 'INOVASI', subtitle: 'Safety Stock Obat', icon: null, image: null, video: '/card/inovasi.mp4', narration: 'Peluncuran sistem inovasi Safety Stock Obat untuk menjamin ketersediaan obat secara real-time dan aman bagi pasien.' }
 ]
 
 const logos = [
@@ -716,6 +738,7 @@ const activeLogoIndex = ref(0)
 const nextLogo = () => {
   activeLogoIndex.value = (activeLogoIndex.value + 1) % logos.length
 }
+let showcaseTimer = null
 const activeStatusMessage = ref('')
 const errorMessage = ref('')
 const hasSigned = ref(false)
@@ -784,7 +807,34 @@ onMounted(() => {
     audioManager.startHeartbeat()
     document.removeEventListener('click', enableAudio)
   }
-  document.addEventListener('click', enableAudio)
+  // Network Polling untuk Remote Kontrol Lintas Perangkat
+  let lastKnownTrigger = 0
+  const checkRemoteStatus = async () => {
+    try {
+      const backendUrl = `${window.location.protocol}//${window.location.hostname}:8081`
+      const response = await fetch(`${backendUrl}/api/remote/status`)
+      const data = await response.json()
+      
+      if (data.lastTrigger && data.lastTrigger > lastKnownTrigger) {
+        if (lastKnownTrigger !== 0) { // Hanya merespons perubahan baru setelah load pertama
+          if (!store.isActivated && !isLaunching.value) {
+            startCinematicLaunch()
+          } else if (store.isActivated && !hasSigned.value && !isActivating.value) {
+            finalizeSignature()
+          }
+        }
+        lastKnownTrigger = data.lastTrigger
+      }
+    } catch (error) {
+      // Abaikan error polling senyap
+    }
+  }
+  
+  const pollingInterval = setInterval(checkRemoteStatus, 1000)
+  
+  onUnmounted(() => {
+    clearInterval(pollingInterval)
+  })
 })
 
 const saveTimestamps = () => {
@@ -923,30 +973,48 @@ const loadConfetti = () => {
   })
 }
 
+const handleVideoEnded = () => {
+  // Memberikan jeda 1 detik yang estetik setelah video habis sebelum lanjut ke kartu berikutnya
+  showcaseTimer = setTimeout(() => {
+    playNextCard()
+  }, 1000)
+}
+
+const playNextCard = () => {
+  const nextIndex = currentShowcaseIndex.value + 1
+  if (nextIndex >= showcaseCards.length) {
+    showcaseActive.value = false
+    activeCards.value = [true, true, true, true, true]
+    audioManager.stopShowcaseBGM()
+    if (showcaseTimer) clearTimeout(showcaseTimer)
+    return
+  }
+  playCard(nextIndex)
+}
+
+const playCard = (index) => {
+  if (showcaseTimer) clearTimeout(showcaseTimer)
+  currentShowcaseIndex.value = index
+  
+  const currentCard = showcaseCards[index]
+  
+  // Jika kartu tidak memiliki video (seperti GEDUNG), gunakan timer manual dari input pengaturan
+  if (!currentCard.video) {
+    showcaseTimer = setTimeout(() => {
+      playNextCard()
+    }, showcaseDuration.value * 1000)
+  } else {
+    // Pengaman/Fallback: Lanjut otomatis setelah 90 detik jika video error/tidak memicu event ended
+    showcaseTimer = setTimeout(() => {
+      playNextCard()
+    }, 90000)
+  }
+}
+
 const startShowcase = () => {
   showcaseActive.value = true
-  currentShowcaseIndex.value = 0
-  
   // Putar musik latar showcase
   audioManager.playShowcaseBGM()
-  
-  const playCard = (index) => {
-    if (index >= showcaseCards.length) {
-      // End of showcase, stay on the dashboard with all cards active
-      showcaseActive.value = false
-      activeCards.value = [true, true, true, true, true]
-      audioManager.stopShowcaseBGM()
-      return
-    }
-    
-    currentShowcaseIndex.value = index
-    // Play transition sound effect! (Dihilangkan karena tumpang tindih)
-    
-    setTimeout(() => {
-      playCard(index + 1)
-    }, showcaseDuration.value * 1000)
-  }
-  
   playCard(0)
 }
 
@@ -985,6 +1053,7 @@ const finalizeSignature = async () => {
 }
 
 const resetEverything = () => {
+  if (showcaseTimer) clearTimeout(showcaseTimer)
   audioManager.stopAllActiveSounds()
   store.resetActivation()
   isLaunching.value = false
@@ -999,7 +1068,10 @@ const toggleGlobalMute = () => {
   isGlobalMuted.value ? audioManager.stopAllActiveSounds() : audioManager.startHeartbeat()
 }
 
-onUnmounted(() => audioManager.stopAllActiveSounds())
+onUnmounted(() => {
+  if (showcaseTimer) clearTimeout(showcaseTimer)
+  audioManager.stopAllActiveSounds()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -1555,78 +1627,170 @@ onUnmounted(() => audioManager.stopAllActiveSounds())
 }
 
 /* Showcase Overlay Styles */
+/* Showcase Overlay Styles (Fullscreen Penuh - Menembus Container 1100px) */
 .showcase-overlay {
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(10px);
+  position: fixed;
+  top: 0; 
+  left: 0; 
+  width: 100vw; 
+  height: 100vh;
+  background: rgba(1, 10, 5, 0.97); /* Hitam pekat legam dengan nuansa hijau es sangat tipis untuk kontras maksimal */
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 100;
-  border-radius: 24px;
+  z-index: 9999; /* Berada di atas segala elemen, termasuk navbar */
 }
 
 .showcase-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 2.5rem;
-  width: 80%;
-  max-width: 600px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-  animation: scale-up 0.3s ease-out;
-}
-
-.showcase-header {
-  display: flex;
+  background: rgba(2, 16, 8, 0.95);
+  border: 2px solid rgba(0, 255, 135, 0.4);
+  border-radius: 28px;
+  padding: 4.5rem;
+  width: 95vw;
+  max-width: 1700px; /* Diperlebar ekstrim dari 1450px ke 1700px */
+  height: 85vh; /* Menentukan tinggi agar video dapat meregang maksimal */
+  box-shadow: 0 0 120px rgba(0, 255, 135, 0.25), inset 0 0 60px rgba(0, 255, 135, 0.1);
+  animation: scale-up 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  display: grid;
+  grid-template-columns: 1.4fr 1fr; /* Memperlebar porsi Kiri (Video) menjadi 58% layar */
+  gap: 5rem;
   align-items: center;
-  gap: 2rem;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 1.5rem;
 }
 
-.showcase-icon {
-  font-size: 4rem;
-}
-
-.showcase-image {
-  width: 100px;
-  height: 100px;
+.showcase-media-content {
+  width: 100%;
+  margin-bottom: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1.5px solid rgba(0, 255, 135, 0.25);
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.showcase-img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  border-radius: 8px;
+.showcase-video-wrapper {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
 }
 
-.showcase-title-area h2 {
-  font-size: 2rem;
-  color: #00FF87;
+.showcase-video-player {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.showcase-image-wrapper {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 16 / 9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.showcase-large-img {
+  max-width: 100%;
+  max-height: 380px;
+  object-fit: contain;
+  border-radius: 12px;
+  filter: drop-shadow(0 0 20px rgba(0, 255, 135, 0.35));
+}
+
+.showcase-icon-wrapper {
+  padding: 6rem 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.01);
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.showcase-large-icon {
+  font-size: 7.5rem;
+  filter: drop-shadow(0 0 35px rgba(0, 255, 135, 0.5));
+  animation: pulse-glow 2s infinite ease-in-out;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+
+.showcase-info-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1rem 0;
+}
+
+.showcase-main-title {
+  font-size: 3.5rem !important; /* Font sangat besar, sangat terbaca di aula */
+  font-family: 'Playfair Display', serif;
+  font-weight: 800;
+  background: linear-gradient(135deg, #00FF87 0%, #60EFFF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.showcase-sub-title {
+  font-size: 2rem !important; /* Warna kontras oranye emas */
+  color: #F79633 !important;
+  margin: 0.8rem 0 0 0;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.showcase-divider {
+  width: 120px;
+  height: 5px;
+  background: linear-gradient(90deg, #00FF87, transparent);
+  margin: 2.5rem 0;
+  border-radius: 3px;
+}
+
+.showcase-body {
   margin: 0;
 }
 
-.showcase-title-area h3 {
-  font-size: 1.2rem;
-  color: #F79633;
-  margin: 0.5rem 0 0 0;
-}
-
-.showcase-body p {
-  font-size: 1.1rem;
+.showcase-narration-text {
+  font-size: 1.55rem !important; /* Baris tulisan besar agar nyaman dibaca hadirin di kejauhan */
   line-height: 1.8;
   color: #E2E8F0;
   margin: 0;
+  font-weight: 400;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 @keyframes scale-up {
-  from { transform: scale(0.9); opacity: 0; }
+  from { transform: scale(0.92); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
+}
+
+/* Transisi Halus Antar Video / Kartu Sinematik (Fade + Zoom Scale Effect) */
+.showcase-card-transition-enter-active,
+.showcase-card-transition-leave-active {
+  transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.showcase-card-transition-enter-from {
+  opacity: 0;
+  transform: scale(0.95) translateY(15px); /* Sedikit membesar dan naik perlahan */
+}
+
+.showcase-card-transition-leave-to {
+  opacity: 0;
+  transform: scale(1.03) translateY(-15px); /* Menghilang dengan zoom keluar lembut */
 }
 </style>

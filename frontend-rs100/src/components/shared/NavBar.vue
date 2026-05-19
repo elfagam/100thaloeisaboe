@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar">
+  <nav class="navbar ghost-mode" :class="{ 'visible-mode': forceShow }">
     <div class="logo">
       <span class="gold-text">RS100</span>
       <span class="divider">|</span>
@@ -22,8 +22,26 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useActivationStore } from '../../store/activation'
+
 const store = useActivationStore()
+const forceShow = ref(false)
+
+const handleKeydown = (e) => {
+  // Tombol Rahasia: Shift + M (M = Menu)
+  if (e.shiftKey && (e.key === 'M' || e.key === 'm')) {
+    forceShow.value = !forceShow.value
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
+})
 </script>
 
 <style lang="scss" scoped>
@@ -39,7 +57,23 @@ const store = useActivationStore()
   position: sticky;
   top: 0;
   z-index: 1000;
-  transition: background 0.3s ease, border-bottom 0.3s ease;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease, background 0.3s ease, border-bottom 0.3s ease;
+
+  // Fitur Hotkey Menu untuk Layar Peresmian (Shift + M)
+  &.ghost-mode {
+    position: fixed;
+    width: 100%;
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none; // Matikan fungsi klik agar tidak mengganggu elemen di bawahnya
+    
+    // Jika tombol rahasia ditekan, tampilkan navbar
+    &.visible-mode {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto; // Kembalikan fungsi klik
+    }
+  }
 }
 
 .logo {

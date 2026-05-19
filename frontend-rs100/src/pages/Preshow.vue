@@ -113,7 +113,10 @@ const videoList = ref([
   '/ucapan/video 9.mp4',
   '/ucapan/video 10.mp4',
   '/ucapan/video 11.mp4',
-  
+  '/ucapan/video 12.mp4',
+  '/ucapan/video 13.mp4',
+  '/ucapan/video 14.mp4',
+  '/ucapan/video 15.mp4', 
 ])
 
 const currentVideoIndex = ref(0)
